@@ -1,4 +1,4 @@
-package com.appshack.versiongate
+package com.appshack.appdelivery
 
 import org.junit.Test
 

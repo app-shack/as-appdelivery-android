@@ -1,10 +1,10 @@
-package com.appshack.versiongate.mvp.main_activity
+package com.appshack.appdelivery.mvp.main
 
-import com.appshack.versiongate.network.api_requests.APIRequest
-import com.appshack.versiongate.network.api_requests.UpdateRequest
-import com.appshack.versiongate.network.dispatchers.Dispatcher
-import com.appshack.versiongate.network.response_handlers.ResponseHandler
-import com.appshack.versiongate.network.response_models.UpdateResponseModel
+import com.appshack.appdelivery.network.api.requests.APIRequest
+import com.appshack.appdelivery.network.api.requests.UpdateRequest
+import com.appshack.appdelivery.network.dispatchers.Dispatcher
+import com.appshack.appdelivery.network.api.parsers.ResponseParser
+import com.appshack.appdelivery.network.api.models.UpdateResponseModel
 import java.io.IOException
 
 
@@ -17,7 +17,7 @@ class MainPresenter(val activity: MainActivityPresenterRelations.Activity) : Mai
         activity.setTextViewText("Fetching...")
         val apiRequest: APIRequest = UpdateRequest()
         val dispatcher = Dispatcher()
-        dispatcher.dispatch(apiRequest, ResponseHandler(onResultCallback))
+        dispatcher.dispatch(apiRequest, ResponseParser(onResultCallback))
 
     }
 

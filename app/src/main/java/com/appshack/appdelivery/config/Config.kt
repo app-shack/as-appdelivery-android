@@ -1,4 +1,4 @@
-package com.appshack.versiongate.config
+package com.appshack.appdelivery.config
 
 
 /**

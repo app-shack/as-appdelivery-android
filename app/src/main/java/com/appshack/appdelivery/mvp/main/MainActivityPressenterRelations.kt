@@ -1,4 +1,4 @@
-package com.appshack.versiongate.mvp.main_activity
+package com.appshack.appdelivery.mvp.main
 
 
 /**

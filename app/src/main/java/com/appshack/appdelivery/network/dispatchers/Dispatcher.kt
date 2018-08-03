@@ -1,7 +1,7 @@
-package com.appshack.versiongate.network.dispatchers
+package com.appshack.appdelivery.network.dispatchers
 
-import com.appshack.versiongate.network.api_requests.APIRequest
-import com.appshack.versiongate.network.api_requests.HTTPMethod
+import com.appshack.appdelivery.network.api.requests.APIRequest
+import com.appshack.appdelivery.network.api.requests.HTTPMethod
 import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.Request

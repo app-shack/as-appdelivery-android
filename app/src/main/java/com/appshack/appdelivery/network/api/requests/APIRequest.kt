@@ -1,6 +1,6 @@
-package com.appshack.versiongate.network.api_requests
+package com.appshack.appdelivery.network.api.requests
 
-import com.appshack.versiongate.config.Config
+import com.appshack.appdelivery.config.Config
 import okhttp3.HttpUrl
 import okhttp3.RequestBody
 

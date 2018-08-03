@@ -1,4 +1,4 @@
-package com.appshack.versiongate.network.response_models
+package com.appshack.appdelivery.network.api.models
 
 import com.fasterxml.jackson.annotation.JsonProperty
 

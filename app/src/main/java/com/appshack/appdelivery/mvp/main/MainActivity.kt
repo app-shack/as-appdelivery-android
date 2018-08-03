@@ -1,9 +1,9 @@
-package com.appshack.versiongate.mvp.main_activity
+package com.appshack.appdelivery.mvp.main
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import com.appshack.versiongate.R
+import com.appshack.appdelivery.R
 import kotlinx.android.synthetic.main.activity_main.*
 
 
