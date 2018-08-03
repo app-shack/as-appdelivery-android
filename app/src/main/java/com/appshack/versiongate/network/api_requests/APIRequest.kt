@@ -1,4 +1,4 @@
-package com.appshack.versiongate.network
+package com.appshack.versiongate.network.api_requests
 
 import com.appshack.versiongate.config.Config
 import okhttp3.HttpUrl
@@ -33,6 +33,10 @@ enum class HTTPMethod {
     PUT(),
     PATCH(),
     DELETE()
+}
+
+enum class UrlPaths(val path: String) {
+    Updates("/data")
 }
 
 class MediaType {

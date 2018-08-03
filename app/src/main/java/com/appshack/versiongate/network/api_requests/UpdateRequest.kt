@@ -1,8 +1,6 @@
 package com.appshack.versiongate.network.api_requests
 
 import com.appshack.versiongate.config.Config
-import com.appshack.versiongate.network.APIRequest
-import com.appshack.versiongate.network.HTTPMethod
 import okhttp3.HttpUrl
 
 

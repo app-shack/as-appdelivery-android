@@ -1,8 +1,7 @@
-package com.appshack.versiongate.network
+package com.appshack.versiongate.network.response_handlers
 
 import android.util.Log
-import android.widget.TextView
-import com.appshack.versiongate.ResultCallback
+import com.appshack.versiongate.mvp.main_activity.ResultCallback
 import com.appshack.versiongate.network.response_models.UpdateResponseModel
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
