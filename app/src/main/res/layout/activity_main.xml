@@ -17,6 +17,6 @@
         android:layout_marginBottom="24dp"
         android:layout_centerHorizontal="true"
         android:text="Fetch"
-        android:layout_alignParentBottom="true"/>
+        android:layout_alignParentBottom="true" />
 
 </RelativeLayout>
