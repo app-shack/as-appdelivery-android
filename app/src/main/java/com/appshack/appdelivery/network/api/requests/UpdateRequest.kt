@@ -10,5 +10,5 @@ import okhttp3.HttpUrl
  */
 class UpdateRequest : APIRequest() {
     override val method: HTTPMethod = HTTPMethod.GET
-    override val path: HttpUrl = HttpUrl.parse(Config.baseUrl + UrlPaths.Updates.path )!!.newBuilder().build()
+    override val path: HttpUrl = HttpUrl.parse(Config.baseUrl + UrlPaths.Updates.path)!!.newBuilder().build()
 }

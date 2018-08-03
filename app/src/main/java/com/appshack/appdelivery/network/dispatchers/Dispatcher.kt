@@ -21,7 +21,7 @@ class Dispatcher {
 
         var requestBuilder = Request.Builder()
                 .url(path)
-                //.addHeader("Authorization", "")
+                .addHeader("Authorization", "")
 
         apiRequest.body?.let {
             requestBuilder = when (apiRequest.method) {
