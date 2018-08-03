@@ -1,2 +1,2 @@
-# as-version-gate-android
+# as-appdelivery-android
 SDK for distribution version control
