@@ -31,7 +31,7 @@ class ResponseParser(private val callback: ResultCallback) : Callback {
         } else {
             response?.body()?.string()?.let {
                 val mapper = jacksonObjectMapper()
-                val obj = JsonParser().parse(it).toString()//.asJsonObject.get("results").toString()
+                val obj = JsonParser().parse(it).toString()
                 val versionDataModel: VersionDataModel = mapper.readValue(obj)
 
                 callback.onComplete(versionDataModel)

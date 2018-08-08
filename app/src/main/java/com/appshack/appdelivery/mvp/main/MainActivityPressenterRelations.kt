@@ -1,6 +1,7 @@
 package com.appshack.appdelivery.mvp.main
 
-import android.content.pm.PackageInfo
+import android.content.Context
+import com.appshack.appdelivery.entity.VersionCheckResult
 
 
 /**
@@ -9,14 +10,8 @@ import android.content.pm.PackageInfo
  */
 
 
-interface MainActivityPresenterRelations {
-
-    interface Activity {
-        var packageInformation: PackageInfo
-        fun setTextViewText(text: String)
-    }
-
-    interface Presenter {
-        fun checkForUpdates()
-    }
+interface AppDeliveryInterface {
+    val context: Context?
+    fun setTextViewText(text: String)
+    fun onVersionCheckResult(versionCheckResult: VersionCheckResult)
 }

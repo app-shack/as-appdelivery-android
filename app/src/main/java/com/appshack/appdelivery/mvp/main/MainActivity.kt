@@ -1,31 +1,45 @@
 package com.appshack.appdelivery.mvp.main
 
-import android.content.pm.PackageInfo
+import android.content.Context
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.appshack.appdelivery.R
+import com.appshack.appdelivery.entity.VersionCheckResult
+import com.appshack.appdelivery.entity.VersionResultCode
 import kotlinx.android.synthetic.main.activity_main.*
 
 
-class MainActivity : AppCompatActivity(), MainActivityPresenterRelations.Activity {
+class MainActivity : AppCompatActivity(), AppDeliveryInterface {
 
-    override lateinit var packageInformation: PackageInfo
+    override val context: Context
+        get() {
+            return this
+        }
+
+    override fun onVersionCheckResult(versionCheckResult: VersionCheckResult) {
+        when (versionCheckResult.resultCode) {
+            VersionResultCode.UP_TO_DATE -> Unit
+            VersionResultCode.UPDATE_AVAILABLE -> Unit //Implement custom prompt to upgrade
+            VersionResultCode.UPDATE_REQUIRED -> Unit //Implement lock down here
+            VersionResultCode.ERROR -> Unit //Handle error here
+        }
+    }
+
     lateinit var presenter: MainPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        packageInformation = this.packageManager.getPackageInfo(packageName, 0)
         presenter = MainPresenter(this)
         Log.d("@dev onCreate", "layout completed")
 
         setupListeners()
-        presenter.checkForUpdates()
+        presenter.startVersionCheckForResult()
     }
 
     private fun setupListeners() {
-        fetchButton.setOnClickListener { presenter.checkForUpdates() }
+        fetchButton.setOnClickListener { presenter.startVersionCheckForResult() }
     }
 
     override fun setTextViewText(text: String) {

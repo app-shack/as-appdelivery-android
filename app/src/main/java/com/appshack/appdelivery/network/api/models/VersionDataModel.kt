@@ -11,10 +11,8 @@ data class VersionDataModel(
         val requiredVersion: String? = null,
 
         @field:JsonProperty("latest_version")
-        val latestVersion: String? = null
-) {
-    var isUpdateRequired: Boolean? = null
-    var isUpdateAvailable: Boolean? = null
+        val latestVersion: String? = null,
 
-    var currentVersion: String? = "0.0.0"
-}
+        @field:JsonProperty("latest_version_url")
+        val latestVersionUrl: String? = null
+)
