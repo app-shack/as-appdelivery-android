@@ -26,12 +26,12 @@ class MainActivity : AppCompatActivity(), AppDeliveryInterface {
         }
     }
 
-    lateinit var presenter: MainPresenter
+    lateinit var presenter: AppDelivery
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        presenter = MainPresenter(this)
+        presenter = AppDelivery(this)
         Log.d("@dev onCreate", "layout completed")
 
         setupListeners()

@@ -15,7 +15,7 @@ import com.appshack.appdelivery.utility.extensions.toVersionList
  * Created by joelbrostrom on 2018-08-03
  * Developed by App Shack
  */
-class MainPresenter(val appDeliveryInterface: AppDeliveryInterface) {
+class AppDelivery(val appDeliveryInterface: AppDeliveryInterface) {
 
     fun startVersionCheckForResult() {
         appDeliveryInterface.setTextViewText("Fetching...")
@@ -84,7 +84,7 @@ class MainPresenter(val appDeliveryInterface: AppDeliveryInterface) {
         }
     }
 
-    fun getCurrentVersion(): MutableList<Int> =
+    private fun getCurrentVersion(): MutableList<Int> =
             appDeliveryInterface.context?.packageManager
                     ?.getPackageInfo(appDeliveryInterface.context?.packageName, 0)
                     ?.versionName
