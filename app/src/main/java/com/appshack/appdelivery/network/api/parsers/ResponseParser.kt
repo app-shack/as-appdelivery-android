@@ -1,7 +1,7 @@
 package com.appshack.appdelivery.network.api.parsers
 
 import android.util.Log
-import com.appshack.appdelivery.mvp.main.ResultCallback
+import com.appshack.appdelivery.interfaces.ResultCallback
 import com.appshack.appdelivery.network.api.models.VersionDataModel
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue

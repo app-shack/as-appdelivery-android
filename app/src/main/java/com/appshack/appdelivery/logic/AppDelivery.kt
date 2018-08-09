@@ -1,7 +1,9 @@
-package com.appshack.appdelivery.mvp.main
+package com.appshack.appdelivery.logic
 
 import com.appshack.appdelivery.entity.VersionCheckResult
 import com.appshack.appdelivery.entity.VersionResultCode
+import com.appshack.appdelivery.interfaces.AppDeliveryInterface
+import com.appshack.appdelivery.interfaces.ResultCallback
 import com.appshack.appdelivery.network.api.models.VersionDataModel
 import com.appshack.appdelivery.network.api.parsers.ResponseParser
 import com.appshack.appdelivery.network.api.requests.APIRequest
@@ -50,13 +52,13 @@ class AppDelivery(val appDeliveryInterface: AppDeliveryInterface) {
         return isLeftGreater ?: false
     }
 
-    fun getVersionResultCode(isUpdateRequired: Boolean?, isUpdateAvailable: Boolean?)
-            : VersionResultCode =
-            when {
-                isUpdateRequired == true -> VersionResultCode.UPDATE_REQUIRED
-                isUpdateAvailable == true -> VersionResultCode.UPDATE_AVAILABLE
-                else -> VersionResultCode.UP_TO_DATE
-            }
+    fun getVersionResultCode(isUpdateRequired: Boolean?, isUpdateAvailable: Boolean?): VersionResultCode {
+        return when {
+            isUpdateRequired == true -> VersionResultCode.UPDATE_REQUIRED
+            isUpdateAvailable == true -> VersionResultCode.UPDATE_AVAILABLE
+            else -> VersionResultCode.UP_TO_DATE
+        }
+    }
 
     fun buildVersionCheckResult(versionDataModel: VersionDataModel): VersionCheckResult {
         with(versionDataModel) {
@@ -84,12 +86,13 @@ class AppDelivery(val appDeliveryInterface: AppDeliveryInterface) {
         }
     }
 
-    private fun getCurrentVersion(): MutableList<Int> =
-            appDeliveryInterface.context?.packageManager
-                    ?.getPackageInfo(appDeliveryInterface.context?.packageName, 0)
-                    ?.versionName
-                    ?.toVersionList()
-                    ?: mutableListOf(0, 0, 0)
+    private fun getCurrentVersion(): MutableList<Int> {
+        return appDeliveryInterface.context?.packageManager
+                ?.getPackageInfo(appDeliveryInterface.context?.packageName, 0)
+                ?.versionName
+                ?.toVersionList()
+                ?: mutableListOf(0, 0, 0)
+    }
 
     private val onResultCallback: ResultCallback = object : ResultCallback {
 
@@ -107,8 +110,8 @@ class AppDelivery(val appDeliveryInterface: AppDeliveryInterface) {
                         "minimum version: ${versionCheckResult.minimumVersion?.cleanListPrint()}\n" +
                         "maximum version: ${versionCheckResult.maximumVersion?.cleanListPrint()}\n\n" +
                         "update required: ${versionCheckResult.isUpdateRequired}\n" +
-                        "update available: ${versionCheckResult.isUpdateAvailable}\n" +
-                        "download link: ${versionCheckResult.downloadUrl}")
+                        "update available: ${versionCheckResult.isUpdateAvailable}\n")
+                        //"download link: ${versionCheckResult.downloadUrl}")
             }
 
         }
@@ -122,8 +125,4 @@ class AppDelivery(val appDeliveryInterface: AppDeliveryInterface) {
     }
 }
 
-interface ResultCallback {
-    fun onComplete(result: VersionDataModel?)
-    fun onFailure(error: String?)
-}
 

@@ -3,8 +3,8 @@ package com.appshack.appdelivery
 import android.content.Context
 import com.appshack.appdelivery.entity.VersionCheckResult
 import com.appshack.appdelivery.entity.VersionResultCode
-import com.appshack.appdelivery.mvp.main.AppDelivery
-import com.appshack.appdelivery.mvp.main.AppDeliveryInterface
+import com.appshack.appdelivery.logic.AppDelivery
+import com.appshack.appdelivery.interfaces.AppDeliveryInterface
 import junit.framework.Assert.*
 import org.junit.Before
 import org.junit.Test

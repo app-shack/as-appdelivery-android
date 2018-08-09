@@ -1,4 +1,4 @@
-package com.appshack.appdelivery.mvp.main
+package com.appshack.appdelivery.interfaces
 
 import android.content.Context
 import com.appshack.appdelivery.entity.VersionCheckResult
