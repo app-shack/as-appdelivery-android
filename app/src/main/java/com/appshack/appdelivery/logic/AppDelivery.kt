@@ -42,14 +42,12 @@ class AppDelivery(val appDeliveryInterface: AppDeliveryInterface) {
         return adjustedVersions
     }
 
-    fun isVersionGraterThen(leftVersion: List<Int>?, rightVersion: List<Int>?): Boolean {
-        if (leftVersion == null || rightVersion == null) return false
-        var isLeftGreater: Boolean? = null
+    fun isVersionGraterThen(leftVersion: List<Int>, rightVersion: List<Int>): Boolean {
         for ((index, left) in leftVersion.withIndex()) when {
-            left > rightVersion[index] && isLeftGreater == null -> isLeftGreater = true
-            left < rightVersion[index] && isLeftGreater == null -> isLeftGreater = false
+            left > rightVersion[index] -> return true
+            left < rightVersion[index] -> return false
         }
-        return isLeftGreater ?: false
+        return false
     }
 
     fun getVersionResultCode(isUpdateRequired: Boolean?, isUpdateAvailable: Boolean?): VersionResultCode {
@@ -66,13 +64,15 @@ class AppDelivery(val appDeliveryInterface: AppDeliveryInterface) {
             val downloadUrl = latestVersionUrl
             val minimumVersion = requiredVersion?.toVersionList()
             val maximumVersion = latestVersion?.toVersionList()
-
             val versions = listOfNotNull(currentVersion, minimumVersion, maximumVersion)
             val maxLength = getMaxLength(versions)
+
             adjustVersionLength(versions, maxLength)
 
-            val isUpdateRequired = isVersionGraterThen(minimumVersion, currentVersion)
-            val isUpdateAvailable = isVersionGraterThen(maximumVersion, currentVersion)
+            val isUpdateRequired: Boolean? = if (minimumVersion != null )
+                isVersionGraterThen(minimumVersion, currentVersion) else null
+            val isUpdateAvailable: Boolean? = if (maximumVersion != null)
+                isVersionGraterThen(maximumVersion, currentVersion) else null
             val versionCheckResult = getVersionResultCode(isUpdateRequired, isUpdateAvailable)
 
             return VersionCheckResult(
@@ -111,7 +111,6 @@ class AppDelivery(val appDeliveryInterface: AppDeliveryInterface) {
                         "maximum version: ${versionCheckResult.maximumVersion?.cleanListPrint()}\n\n" +
                         "update required: ${versionCheckResult.isUpdateRequired}\n" +
                         "update available: ${versionCheckResult.isUpdateAvailable}\n")
-                        //"download link: ${versionCheckResult.downloadUrl}")
             }
 
         }
