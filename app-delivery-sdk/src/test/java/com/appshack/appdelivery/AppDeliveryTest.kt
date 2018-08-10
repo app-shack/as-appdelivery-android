@@ -190,4 +190,38 @@ class AppDeliveryTest {
         assertEquals(expected, appDelivery.adjustVersionLength(candidates, maxLength))
     }
 
+    @Test
+    fun buildVersionCheckResult_updateRequired_ShouldReturnUPDATE_REQUIRED() {
+        val versionDataModel = VersionDataModel(requiredVersion = "99.99.99")
+        val versionCheckResult = appDelivery.buildVersionCheckResult(versionDataModel)
+        assertEquals(VersionResultCode.UPDATE_REQUIRED, versionCheckResult.resultCode)
+    }
+
+    @Test
+    fun buildVersionCheckResult_updateAvailable_ShouldReturnUPDATE_AVAILABLE() {
+        val versionDataModel = VersionDataModel(latestVersion = "99.99.99")
+        val versionCheckResult = appDelivery.buildVersionCheckResult(versionDataModel)
+        assertEquals(VersionResultCode.UPDATE_AVAILABLE, versionCheckResult.resultCode)
+    }
+
+    @Test
+    fun buildVersionCheckResult_upToDate_ShouldReturnUP_TO_DATE() {
+        val versionDataModel = VersionDataModel(requiredVersion = "0.0.0", latestVersion = "0.0.0")
+        val versionCheckResult = appDelivery.buildVersionCheckResult(versionDataModel)
+        assertEquals(VersionResultCode.UP_TO_DATE, versionCheckResult.resultCode)
+    }
+
+    @Test
+    fun buildVersionCheckResult_pToDate_ShouldReturnUP_TO_DATE() {
+        val versionDataModel = VersionDataModel("com.id.test","0.0.0", "0.0.0", "http://google.com")
+        val versionCheckResult = appDelivery.buildVersionCheckResult(versionDataModel)
+        val expected = VersionCheckResult(
+                VersionResultCode.UP_TO_DATE,
+                "http://google.com",
+                listOf(0, 0, 0),
+                listOf(0, 0, 0),
+                listOf(0, 0, 0))
+        assertEquals(expected, versionCheckResult)
+    }
+
 }
