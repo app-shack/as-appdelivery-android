@@ -40,7 +40,7 @@ class ResponseParser(private val callback: ResultCallback) : Callback {
 
     override fun onResponse(call: Call?, response: Response?) {
         val errorMessage = getErrorMessage(response)
-        if (errorMessage.isNullOrBlank()) {
+        if (errorMessage != null) {
             callback.onFailure(errorMessage)
         } else {
             response?.body()?.string()?.let {

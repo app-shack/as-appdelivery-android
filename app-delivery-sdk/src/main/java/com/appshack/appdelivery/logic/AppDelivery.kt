@@ -7,7 +7,7 @@ import com.appshack.appdelivery.interfaces.ResultCallback
 import com.appshack.appdelivery.network.api.models.VersionDataModel
 import com.appshack.appdelivery.network.api.parsers.ResponseParser
 import com.appshack.appdelivery.network.api.requests.APIRequest
-import com.appshack.appdelivery.network.api.requests.UpdateRequest
+import com.appshack.appdelivery.network.api.requests.VersionStatusRequest
 import com.appshack.appdelivery.network.dispatchers.Dispatcher
 import com.appshack.appdelivery.utility.extensions.toVersionList
 
@@ -24,7 +24,36 @@ class AppDelivery(val appDeliveryInterface: AppDeliveryInterface) {
         dispatcher.dispatch(apiRequest, ResponseParser(onResultCallback))
     }
 
-    fun getMaxLength(candidates: List<List<Int>>): Int {
+    internal fun buildVersionCheckResult(versionDataModel: VersionDataModel): VersionCheckResult {
+        val downloadUrl = versionDataModel.latestVersionUrl
+        val currentVersion = getCurrentVersion()
+        val minimumVersion = versionDataModel.requiredVersion?.toVersionList() ?: mutableListOf()
+        val maximumVersion = versionDataModel.latestVersion?.toVersionList() ?: mutableListOf()
+
+        val versions = listOf(currentVersion, minimumVersion, maximumVersion)
+        val maxLength = getMaxLength(versions)
+        adjustVersionLength(versions, maxLength)
+
+        val isUpdateRequired = isVersionGraterThen(minimumVersion, currentVersion)
+        val isUpdateAvailable = isVersionGraterThen(maximumVersion, currentVersion)
+        val resultCode = getVersionResultCode(isUpdateRequired, isUpdateAvailable)
+
+        return VersionCheckResult(
+                resultCode,
+                downloadUrl,
+                currentVersion,
+                minimumVersion,
+                maximumVersion)
+    }
+
+    private fun getCurrentVersion(): MutableList<Int> {
+        return appDeliveryInterface.context?.packageManager
+                ?.getPackageInfo(appDeliveryInterface.context?.packageName, 0)
+                ?.versionName
+                ?.toVersionList()
+                ?: mutableListOf(0, 0, 0)
+    }
+
         return candidates.maxBy { it.size }?.size ?: 0
     }
 
@@ -51,42 +80,6 @@ class AppDelivery(val appDeliveryInterface: AppDeliveryInterface) {
             isUpdateAvailable == true -> VersionResultCode.UPDATE_AVAILABLE
             else -> VersionResultCode.UP_TO_DATE
         }
-    }
-
-    fun buildVersionCheckResult(versionDataModel: VersionDataModel): VersionCheckResult {
-        with(versionDataModel) {
-            val currentVersion = getCurrentVersion()
-            val downloadUrl = latestVersionUrl
-            val minimumVersion = requiredVersion?.toVersionList()
-            val maximumVersion = latestVersion?.toVersionList()
-            val versions = listOfNotNull(currentVersion, minimumVersion, maximumVersion)
-            val maxLength = getMaxLength(versions)
-
-            adjustVersionLength(versions, maxLength)
-
-            val isUpdateRequired: Boolean? = if (minimumVersion != null )
-                isVersionGraterThen(minimumVersion, currentVersion) else null
-            val isUpdateAvailable: Boolean? = if (maximumVersion != null)
-                isVersionGraterThen(maximumVersion, currentVersion) else null
-            val versionCheckResult = getVersionResultCode(isUpdateRequired, isUpdateAvailable)
-
-            return VersionCheckResult(
-                    versionCheckResult,
-                    downloadUrl,
-                    currentVersion,
-                    minimumVersion,
-                    maximumVersion,
-                    isUpdateRequired,
-                    isUpdateAvailable)
-        }
-    }
-
-    private fun getCurrentVersion(): MutableList<Int> {
-        return appDeliveryInterface.context?.packageManager
-                ?.getPackageInfo(appDeliveryInterface.context?.packageName, 0)
-                ?.versionName
-                ?.toVersionList()
-                ?: mutableListOf(0, 0, 0)
     }
 
     private val onResultCallback: ResultCallback = object : ResultCallback {
