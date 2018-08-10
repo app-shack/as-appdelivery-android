@@ -38,6 +38,13 @@ class AppDeliveryTest {
     }
 
     @Test
+    fun toVersionList_stringToList_shouldReturnList() {
+        val arg = "1.3.2"
+        val expected = mutableListOf(1, 3, 2)
+        assertEquals(expected, arg.toVersionList())
+    }
+
+    @Test
     fun getMaxVersionLength_longer_shouldReturnFour() {
         val left = listOf(1, 2, 3, 4)
         val right = listOf(1, 2, 3)
