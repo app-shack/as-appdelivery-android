@@ -30,15 +30,13 @@ class AppDelivery(val appDeliveryInterface: AppDeliveryInterface) {
         return candidates.maxBy { it.size }?.size ?: 0
     }
 
-    fun adjustVersionLength(versions: List<MutableList<Int>>, length: Int): List<MutableList<Int>> {
-        val adjustedVersions = mutableListOf<MutableList<Int>>()
+    internal fun adjustVersionLength(versions: List<MutableList<Int>>, length: Int): List<MutableList<Int>> {
         for (version in versions) {
             while (version.size < length) {
                 version.add(0)
             }
-            adjustedVersions.add(version)
         }
-        return adjustedVersions
+        return versions
     }
 
     fun isVersionGraterThen(leftVersion: List<Int>, rightVersion: List<Int>): Boolean {
