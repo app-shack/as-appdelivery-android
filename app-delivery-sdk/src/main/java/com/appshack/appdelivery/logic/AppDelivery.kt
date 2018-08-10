@@ -9,7 +9,6 @@ import com.appshack.appdelivery.network.api.parsers.ResponseParser
 import com.appshack.appdelivery.network.api.requests.APIRequest
 import com.appshack.appdelivery.network.api.requests.UpdateRequest
 import com.appshack.appdelivery.network.dispatchers.Dispatcher
-import com.appshack.appdelivery.utility.extensions.cleanListPrint
 import com.appshack.appdelivery.utility.extensions.toVersionList
 
 
@@ -20,8 +19,7 @@ import com.appshack.appdelivery.utility.extensions.toVersionList
 class AppDelivery(val appDeliveryInterface: AppDeliveryInterface) {
 
     fun startVersionCheckForResult() {
-        appDeliveryInterface.setTextViewText("Fetching...")
-        val apiRequest: APIRequest = UpdateRequest()
+        val apiRequest: APIRequest = VersionStatusRequest()
         val dispatcher = Dispatcher()
         dispatcher.dispatch(apiRequest, ResponseParser(onResultCallback))
     }
@@ -98,26 +96,16 @@ class AppDelivery(val appDeliveryInterface: AppDeliveryInterface) {
                 val versionCheckResult = buildVersionCheckResult(it)
                 appDeliveryInterface.onVersionCheckResult(versionCheckResult)
 
-                /**
-                 * For debugging and testing
-                 */
-                appDeliveryInterface.setTextViewText("name: ${it.identifier}\n" +
-                        "current version: ${versionCheckResult.currentVersion?.cleanListPrint()}\n" +
-                        "minimum version: ${versionCheckResult.minimumVersion?.cleanListPrint()}\n" +
-                        "maximum version: ${versionCheckResult.maximumVersion?.cleanListPrint()}\n\n" +
-                        "update required: ${versionCheckResult.isUpdateRequired}\n" +
-                        "update available: ${versionCheckResult.isUpdateAvailable}\n")
             }
         }
 
         override fun onFailure(error: String?) {
             val versionCheckResult = VersionCheckResult(VersionResultCode.ERROR, errorMessage = error)
             appDeliveryInterface.onVersionCheckResult(versionCheckResult)
-            appDeliveryInterface.setTextViewText(error ?: "Unknown error")
         }
 
     }
-
 }
+
 
 

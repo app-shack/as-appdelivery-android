@@ -12,6 +12,5 @@ import com.appshack.appdelivery.entity.VersionCheckResult
 
 interface AppDeliveryInterface {
     val context: Context?
-    fun setTextViewText(text: String)
     fun onVersionCheckResult(versionCheckResult: VersionCheckResult)
 }

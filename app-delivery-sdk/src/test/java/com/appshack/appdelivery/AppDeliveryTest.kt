@@ -3,8 +3,10 @@ package com.appshack.appdelivery
 import android.content.Context
 import com.appshack.appdelivery.entity.VersionCheckResult
 import com.appshack.appdelivery.entity.VersionResultCode
-import com.appshack.appdelivery.logic.AppDelivery
 import com.appshack.appdelivery.interfaces.AppDeliveryInterface
+import com.appshack.appdelivery.logic.AppDelivery
+import com.appshack.appdelivery.network.api.models.VersionDataModel
+import com.appshack.appdelivery.utility.extensions.toVersionList
 import junit.framework.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -22,7 +24,6 @@ class AppDeliveryTest {
     fun setup() {
         appDeliveryInterface = object : AppDeliveryInterface {
             override val context: Context? = null
-            override fun setTextViewText(text: String) {}
             override fun onVersionCheckResult(versionCheckResult: VersionCheckResult) {}
         }
         appDelivery = AppDelivery(appDeliveryInterface)
