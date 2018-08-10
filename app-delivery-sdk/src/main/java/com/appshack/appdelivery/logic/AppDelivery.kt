@@ -54,6 +54,7 @@ class AppDelivery(val appDeliveryInterface: AppDeliveryInterface) {
                 ?: mutableListOf(0, 0, 0)
     }
 
+    internal fun getMaxLength(candidates: List<List<Int>>): Int {
         return candidates.maxBy { it.size }?.size ?: 0
     }
 
@@ -66,7 +67,7 @@ class AppDelivery(val appDeliveryInterface: AppDeliveryInterface) {
         return versions
     }
 
-    fun isVersionGraterThen(leftVersion: List<Int>, rightVersion: List<Int>): Boolean {
+    internal fun isVersionGraterThen(leftVersion: List<Int>, rightVersion: List<Int>): Boolean {
         for ((index, left) in leftVersion.withIndex()) when {
             left > rightVersion[index] -> return true
             left < rightVersion[index] -> return false
@@ -74,7 +75,7 @@ class AppDelivery(val appDeliveryInterface: AppDeliveryInterface) {
         return false
     }
 
-    fun getVersionResultCode(isUpdateRequired: Boolean?, isUpdateAvailable: Boolean?): VersionResultCode {
+    internal fun getVersionResultCode(isUpdateRequired: Boolean?, isUpdateAvailable: Boolean?): VersionResultCode {
         return when {
             isUpdateRequired == true -> VersionResultCode.UPDATE_REQUIRED
             isUpdateAvailable == true -> VersionResultCode.UPDATE_AVAILABLE
