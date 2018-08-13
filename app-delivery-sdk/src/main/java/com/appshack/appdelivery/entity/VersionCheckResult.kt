@@ -1,5 +1,7 @@
 package com.appshack.appdelivery.entity
 
+import java.io.Serializable
+
 data class VersionCheckResult(
         val resultCode: VersionResultCode,
         val downloadUrl: String? = null,
@@ -7,4 +9,4 @@ data class VersionCheckResult(
         val minimumVersion: List<Int>? = null,
         val maximumVersion: List<Int>? = null,
         val errorMessage: String? = null
-)
+) : Serializable

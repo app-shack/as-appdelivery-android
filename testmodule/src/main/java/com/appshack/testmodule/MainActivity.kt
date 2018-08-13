@@ -13,6 +13,7 @@ import com.appshack.appdelivery.entity.VersionCheckResult
 import com.appshack.appdelivery.entity.VersionResultCode
 import com.appshack.appdelivery.interfaces.AppDeliveryInterface
 import com.appshack.appdelivery.logic.AppDelivery
+import com.appshack.appdelivery.utility.dialog.VersionAlert
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -36,6 +37,7 @@ class MainActivity : AppCompatActivity(), AppDeliveryInterface {
     }
 
     override fun onVersionCheckResult(versionCheckResult: VersionCheckResult) {
+
         runOnUiThread {
             when (versionCheckResult.resultCode) {
 
@@ -57,7 +59,7 @@ class MainActivity : AppCompatActivity(), AppDeliveryInterface {
                     statusTextString.setSpan(
                             RelativeSizeSpan(1.5f), 0, 16, 0)
                     statusText.text = statusTextString
-
+                    VersionAlert.showDialog(this, versionCheckResult)
                 }
 
                 VersionResultCode.UPDATE_REQUIRED -> { //Implement lock down here
@@ -68,6 +70,7 @@ class MainActivity : AppCompatActivity(), AppDeliveryInterface {
                     statusTextString.setSpan(
                             RelativeSizeSpan(1.5f), 0, 16, 0)
                     statusText.text = statusTextString
+                    VersionAlert.showDialog(this, versionCheckResult)
                 }
 
                 VersionResultCode.ERROR -> { //Handle error here

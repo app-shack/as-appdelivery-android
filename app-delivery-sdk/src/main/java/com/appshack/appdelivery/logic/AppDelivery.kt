@@ -16,7 +16,7 @@ import com.appshack.appdelivery.utility.extensions.toVersionList
  * Created by joelbrostrom on 2018-08-03
  * Developed by App Shack
  */
-class AppDelivery(val appDeliveryInterface: AppDeliveryInterface) {
+class AppDelivery(private val appDeliveryInterface: AppDeliveryInterface) {
 
     fun startVersionCheckForResult() {
         val apiRequest: APIRequest = VersionStatusRequest()
@@ -51,7 +51,7 @@ class AppDelivery(val appDeliveryInterface: AppDeliveryInterface) {
                 ?.getPackageInfo(appDeliveryInterface.context?.packageName, 0)
                 ?.versionName
                 ?.toVersionList()
-                ?: mutableListOf(0, 0, 0)
+                ?: mutableListOf(-1, -1, -1)
     }
 
     internal fun getMaxLength(candidates: List<List<Int>>): Int {
