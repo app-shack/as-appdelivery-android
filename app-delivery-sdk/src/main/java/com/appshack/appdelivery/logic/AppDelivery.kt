@@ -16,7 +16,7 @@ import com.appshack.appdelivery.utility.extensions.toVersionList
  * Created by joelbrostrom on 2018-08-03
  * Developed by App Shack
  */
-class AppDelivery(val appDeliveryInterface: AppDeliveryInterface) {
+class AppDelivery(private val appDeliveryInterface: AppDeliveryInterface) {
 
     fun startVersionCheckForResult() {
         val apiRequest: APIRequest = VersionStatusRequest()
