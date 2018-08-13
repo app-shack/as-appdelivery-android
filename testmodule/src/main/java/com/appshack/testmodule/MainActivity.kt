@@ -13,6 +13,7 @@ import com.appshack.appdelivery.entity.VersionCheckResult
 import com.appshack.appdelivery.entity.VersionResultCode
 import com.appshack.appdelivery.interfaces.AppDeliveryInterface
 import com.appshack.appdelivery.logic.AppDelivery
+import com.appshack.appdelivery.utility.dialog.VersionAlert
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -36,6 +37,7 @@ class MainActivity : AppCompatActivity(), AppDeliveryInterface {
     }
 
     override fun onVersionCheckResult(versionCheckResult: VersionCheckResult) {
+        val updateDialog = VersionAlert(this, versionCheckResult)
         runOnUiThread {
             when (versionCheckResult.resultCode) {
 
@@ -57,6 +59,7 @@ class MainActivity : AppCompatActivity(), AppDeliveryInterface {
                     statusTextString.setSpan(
                             RelativeSizeSpan(1.5f), 0, 16, 0)
                     statusText.text = statusTextString
+                    updateDialog.show()
 
                 }
 
@@ -68,6 +71,7 @@ class MainActivity : AppCompatActivity(), AppDeliveryInterface {
                     statusTextString.setSpan(
                             RelativeSizeSpan(1.5f), 0, 16, 0)
                     statusText.text = statusTextString
+                    updateDialog.show()
                 }
 
                 VersionResultCode.ERROR -> { //Handle error here
