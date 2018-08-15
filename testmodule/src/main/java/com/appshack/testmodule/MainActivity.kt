@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity(), AppDeliveryInterface {
     }
 
     override fun onVersionCheckResult(versionCheckResult: VersionCheckResult) {
-        val updateDialog = VersionAlert(this, versionCheckResult)
+
         runOnUiThread {
             when (versionCheckResult.resultCode) {
 
@@ -59,8 +59,7 @@ class MainActivity : AppCompatActivity(), AppDeliveryInterface {
                     statusTextString.setSpan(
                             RelativeSizeSpan(1.5f), 0, 16, 0)
                     statusText.text = statusTextString
-                    updateDialog.show()
-
+                    VersionAlert.showDialog(this, versionCheckResult)
                 }
 
                 VersionResultCode.UPDATE_REQUIRED -> { //Implement lock down here
@@ -71,7 +70,7 @@ class MainActivity : AppCompatActivity(), AppDeliveryInterface {
                     statusTextString.setSpan(
                             RelativeSizeSpan(1.5f), 0, 16, 0)
                     statusText.text = statusTextString
-                    updateDialog.show()
+                    VersionAlert.showDialog(this, versionCheckResult)
                 }
 
                 VersionResultCode.ERROR -> { //Handle error here
