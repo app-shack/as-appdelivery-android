@@ -6,6 +6,7 @@
 
     <application>
 
+        <activity android:name=".utility.dialog.VersionAlert" />
     </application>
 
 </manifest>

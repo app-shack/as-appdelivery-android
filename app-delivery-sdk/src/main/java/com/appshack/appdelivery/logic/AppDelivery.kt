@@ -51,7 +51,7 @@ class AppDelivery(private val appDeliveryInterface: AppDeliveryInterface) {
                 ?.getPackageInfo(appDeliveryInterface.context?.packageName, 0)
                 ?.versionName
                 ?.toVersionList()
-                ?: mutableListOf(0, 0, 0)
+                ?: mutableListOf(-1, -1, -1)
     }
 
     internal fun getMaxLength(candidates: List<List<Int>>): Int {
