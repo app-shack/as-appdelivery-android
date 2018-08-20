@@ -2,7 +2,10 @@ package com.appshack.appdelivery.entity
 
 import java.io.Serializable
 
-data class VersionCheckResult(
+/**
+ * Data model holding JSON variables returned from REST request
+ */
+data class VersionResult(
         val resultCode: VersionResultCode,
         val downloadUrl: String? = null,
         val currentVersion: List<Int>? = null,
