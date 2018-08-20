@@ -10,12 +10,20 @@ import okhttp3.RequestBody
  * Developed by App Shack
  */
 
+/**
+ * Interface for a HttpRequest.
+ * Each REST request needs a path and a method,
+ * but not necessarily a body.
+ */
 private interface HttpRequest {
     val path: HttpUrl
     val method: HTTPMethod
     var body: RequestBody?
 }
 
+/**
+ * Predefine default values common for a http request.
+ */
 abstract class APIRequest : HttpRequest {
 
     override val path: HttpUrl
@@ -23,10 +31,13 @@ abstract class APIRequest : HttpRequest {
     override val method: HTTPMethod
         get() = HTTPMethod.GET
     override var body: RequestBody? = null
-        get() = RequestBody.create(MediaType.FORM, "")
+        get() = RequestBody.create(MediaType.FORM.type, "")
 
 }
 
+/**
+ * Enum containing all different REST methods.
+ */
 enum class HTTPMethod {
     POST(),
     GET(),
@@ -35,15 +46,19 @@ enum class HTTPMethod {
     DELETE()
 }
 
+/**
+ * Enum containing url paths
+ */
 enum class UrlPaths(val path: String) {
     Updates("/data")
 }
 
-class MediaType {
-    companion object {
-        val FORM = okhttp3.MediaType.parse("multipart/form-data")!!
-        val PNG = okhttp3.MediaType.parse("image/png")!!
-    }
+/**
+ * Enum containing predefined MediaTypes
+ */
+enum class MediaType(val type: okhttp3.MediaType) {
+    FORM(okhttp3.MediaType.parse("multipart/form-data")!!),
+    PNG(okhttp3.MediaType.parse("image/png")!!)
 }
 
 

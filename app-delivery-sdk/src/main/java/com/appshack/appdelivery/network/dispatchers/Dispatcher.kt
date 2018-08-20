@@ -10,6 +10,8 @@ import okhttp3.Request
 /**
  * Created by joelbrostrom on 2018-07-27
  * Developed by App Shack
+ *
+ * Purpose: Send API-requests and pass response to responseHandler
  */
 
 class Dispatcher {

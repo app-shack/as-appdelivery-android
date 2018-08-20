@@ -9,7 +9,7 @@ import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
 import android.util.Log
-import com.appshack.appdelivery.entity.VersionCheckResult
+import com.appshack.appdelivery.entity.VersionResult
 import com.appshack.appdelivery.entity.VersionResultCode
 import com.appshack.appdelivery.interfaces.AppDeliveryInterface
 import com.appshack.appdelivery.logic.AppDelivery
@@ -36,10 +36,10 @@ class MainActivity : AppCompatActivity(), AppDeliveryInterface {
         fetchButton.callOnClick()
     }
 
-    override fun onVersionCheckResult(versionCheckResult: VersionCheckResult) {
+    override fun onVersionCheckResult(versionResult: VersionResult) {
 
         runOnUiThread {
-            when (versionCheckResult.resultCode) {
+            when (versionResult.resultCode) {
 
                 VersionResultCode.UP_TO_DATE -> { //All good
                     val statusText = statusTextView
@@ -53,36 +53,36 @@ class MainActivity : AppCompatActivity(), AppDeliveryInterface {
 
                 VersionResultCode.UPDATE_AVAILABLE -> { //Implement custom prompt to upgrade
                     val statusText = statusTextView
-                    val statusTextString = SpannableString("Update Available\ndownload link: ${versionCheckResult.downloadUrl}")
+                    val statusTextString = SpannableString("Update Available\ndownload link: ${versionResult.downloadUrl}")
                     statusTextString.setSpan(ForegroundColorSpan(ContextCompat.getColor(
                             this, R.color.orangeWarning)), 0, 16, 0)
                     statusTextString.setSpan(
                             RelativeSizeSpan(1.5f), 0, 16, 0)
                     statusText.text = statusTextString
-                    VersionAlert.showDialog(this, versionCheckResult)
+                    VersionAlert.showDialog(this, versionResult)
                 }
 
                 VersionResultCode.UPDATE_REQUIRED -> { //Implement lock down here
                     val statusText = statusTextView
-                    val statusTextString = SpannableString("Update Required!\ndownload link: ${versionCheckResult.downloadUrl}")
+                    val statusTextString = SpannableString("Update Required!\ndownload link: ${versionResult.downloadUrl}")
                     statusTextString.setSpan(
                             ForegroundColorSpan(Color.RED), 0, 16, 0)
                     statusTextString.setSpan(
                             RelativeSizeSpan(1.5f), 0, 16, 0)
                     statusText.text = statusTextString
-                    VersionAlert.showDialog(this, versionCheckResult)
+                    VersionAlert.showDialog(this, versionResult)
                 }
 
                 VersionResultCode.ERROR -> { //Handle error here
-                    responseText.text = versionCheckResult.errorMessage
+                    responseText.text = versionResult.errorMessage
 
                 }
             }
 
-            if (versionCheckResult.resultCode != VersionResultCode.ERROR) {
-                responseText.text = "current version: ${versionCheckResult.currentVersion?.cleanListPrint()}\n" +
-                        "minimum version: ${versionCheckResult.minimumVersion?.cleanListPrint()}\n" +
-                        "maximum version: ${versionCheckResult.maximumVersion?.cleanListPrint()}\n\n"
+            if (versionResult.resultCode != VersionResultCode.ERROR) {
+                responseText.text = "current version: ${versionResult.currentVersion?.cleanListPrint()}\n" +
+                        "minimum version: ${versionResult.minimumVersion?.cleanListPrint()}\n" +
+                        "maximum version: ${versionResult.maximumVersion?.cleanListPrint()}\n\n"
             }
         }
     }
