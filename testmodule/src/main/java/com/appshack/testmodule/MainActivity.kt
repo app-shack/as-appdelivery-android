@@ -1,5 +1,6 @@
 package com.appshack.testmodule
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
@@ -9,8 +10,8 @@ import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
 import android.util.Log
-import com.appshack.appdelivery.entity.VersionCheckResult
-import com.appshack.appdelivery.entity.VersionResultCode
+import com.appshack.appdelivery.entity.VersionResult
+import com.appshack.appdelivery.entity.VersionResultCode.*
 import com.appshack.appdelivery.interfaces.AppDeliveryInterface
 import com.appshack.appdelivery.logic.AppDelivery
 import com.appshack.appdelivery.utility.dialog.VersionAlert
@@ -19,10 +20,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), AppDeliveryInterface {
 
-    override val context: Context
-        get() {
-            return this
-        }
+    override val context: Context = this
 
     private lateinit var appDelivery: AppDelivery
 
@@ -33,15 +31,17 @@ class MainActivity : AppCompatActivity(), AppDeliveryInterface {
         Log.d("@dev onCreate", "layout completed")
 
         setupListeners()
-        fetchButton.callOnClick()
+        responseText.text = getString(R.string.FETCHING)
+        appDelivery.startVersionCheck()
     }
 
-    override fun onVersionCheckResult(versionCheckResult: VersionCheckResult) {
+    @SuppressLint("SetTextI18n")
+    override fun onVersionCheckResult(versionResult: VersionResult) {
 
         runOnUiThread {
-            when (versionCheckResult.resultCode) {
+            when (versionResult.resultCode) {
 
-                VersionResultCode.UP_TO_DATE -> { //All good
+                UP_TO_DATE -> { //All good
                     val statusText = statusTextView
                     val statusTextString = SpannableString("Up to date!")
                     statusTextString.setSpan(
@@ -51,46 +51,46 @@ class MainActivity : AppCompatActivity(), AppDeliveryInterface {
                     statusText.text = statusTextString
                 }
 
-                VersionResultCode.UPDATE_AVAILABLE -> { //Implement custom prompt to upgrade
+                UPDATE_AVAILABLE -> { //Implement custom prompt to upgrade
                     val statusText = statusTextView
-                    val statusTextString = SpannableString("Update Available\ndownload link: ${versionCheckResult.downloadUrl}")
+                    val statusTextString = SpannableString("Update Available\ndownload link: ${versionResult.downloadUrl}")
                     statusTextString.setSpan(ForegroundColorSpan(ContextCompat.getColor(
                             this, R.color.orangeWarning)), 0, 16, 0)
                     statusTextString.setSpan(
                             RelativeSizeSpan(1.5f), 0, 16, 0)
                     statusText.text = statusTextString
-                    VersionAlert.showDialog(this, versionCheckResult)
+                    VersionAlert.showDialog(this, versionResult)
                 }
 
-                VersionResultCode.UPDATE_REQUIRED -> { //Implement lock down here
+                UPDATE_REQUIRED -> { //Implement lock down here
                     val statusText = statusTextView
-                    val statusTextString = SpannableString("Update Required!\ndownload link: ${versionCheckResult.downloadUrl}")
+                    val statusTextString = SpannableString("Update Required!\ndownload link: ${versionResult.downloadUrl}")
                     statusTextString.setSpan(
                             ForegroundColorSpan(Color.RED), 0, 16, 0)
                     statusTextString.setSpan(
                             RelativeSizeSpan(1.5f), 0, 16, 0)
                     statusText.text = statusTextString
-                    VersionAlert.showDialog(this, versionCheckResult)
+                    VersionAlert.showDialog(this, versionResult)
                 }
 
-                VersionResultCode.ERROR -> { //Handle error here
-                    responseText.text = versionCheckResult.errorMessage
-
+                ERROR -> { //Handle error here
+                    responseText.text = versionResult.errorMessage
                 }
+
             }
 
-            if (versionCheckResult.resultCode != VersionResultCode.ERROR) {
-                responseText.text = "current version: ${versionCheckResult.currentVersion?.cleanListPrint()}\n" +
-                        "minimum version: ${versionCheckResult.minimumVersion?.cleanListPrint()}\n" +
-                        "maximum version: ${versionCheckResult.maximumVersion?.cleanListPrint()}\n\n"
+            if (versionResult.resultCode != ERROR) {
+                responseText.text = "current version: ${versionResult.currentVersion?.cleanListPrint()}\n" +
+                        "minimum version: ${versionResult.minimumVersion?.cleanListPrint()}\n" +
+                        "maximum version: ${versionResult.maximumVersion?.cleanListPrint()}\n\n"
             }
         }
     }
 
     private fun setupListeners() {
         fetchButton.setOnClickListener {
-            responseText.text = "Fetching..."
-            appDelivery.startVersionCheckForResult()
+            responseText.text = getString(R.string.FETCHING)
+            appDelivery.startVersionCheck()
         }
     }
 

@@ -1,12 +1,12 @@
 package com.appshack.appdelivery
 
-import android.content.Context
-import com.appshack.appdelivery.entity.VersionCheckResult
 import com.appshack.appdelivery.entity.VersionResultCode
 import com.appshack.appdelivery.interfaces.AppDeliveryInterface
 import com.appshack.appdelivery.logic.AppDelivery
 import com.appshack.appdelivery.network.api.models.VersionDataModel
+import com.appshack.appdelivery.utility.extensions.compareTo
 import com.appshack.appdelivery.utility.extensions.toVersionList
+import com.nhaarman.mockitokotlin2.mock
 import junit.framework.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -17,15 +17,11 @@ import org.junit.Test
  * Developed by App Shack
  */
 class AppDeliveryTest {
-    private lateinit var appDeliveryInterface: AppDeliveryInterface
     private lateinit var appDelivery: AppDelivery
 
     @Before
     fun setup() {
-        appDeliveryInterface = object : AppDeliveryInterface {
-            override val context: Context? = null
-            override fun onVersionCheckResult(versionCheckResult: VersionCheckResult) {}
-        }
+        val appDeliveryInterface: AppDeliveryInterface = mock()
         appDelivery = AppDelivery(appDeliveryInterface)
     }
 
@@ -64,70 +60,70 @@ class AppDeliveryTest {
     fun isVersionGraterThen_equal_shouldReturnFalse() {
         val left = listOf(1, 2, 3)
         val right = listOf(1, 2, 3)
-        assertFalse(appDelivery.isVersionGraterThen(left, right))
+        assertFalse(left > right)
     }
 
     @Test
     fun isVersionGraterThen_major_shouldReturnTrue() {
         val left = listOf(3, 1, 0)
         val right = listOf(1, 0, 2)
-        assertTrue(appDelivery.isVersionGraterThen(left, right))
+        assertTrue(left > right)
     }
 
     @Test
     fun isVersionGraterThen_major_shouldReturnFalse() {
         val left = listOf(1, 1, 5)
         val right = listOf(2, 0, 2)
-        assertFalse(appDelivery.isVersionGraterThen(left, right))
+        assertFalse(left > right)
     }
 
     @Test
     fun isVersionGraterThen_minor_shouldReturnTrue() {
         val left = listOf(2, 1, 5)
         val right = listOf(2, 0, 2)
-        assertTrue(appDelivery.isVersionGraterThen(left, right))
+        assertTrue(left > right)
     }
 
     @Test
     fun isVersionGraterThen_minor_shouldReturnFalse() {
         val left = listOf(2, 1, 0)
         val right = listOf(2, 3, 2)
-        assertFalse(appDelivery.isVersionGraterThen(left, right))
+        assertFalse(left > right)
     }
 
     @Test
     fun isVersionGraterThen_patch_shouldReturnTrue() {
         val left = listOf(3, 3, 5)
         val right = listOf(3, 3, 2)
-        assertTrue(appDelivery.isVersionGraterThen(left, right))
+        assertTrue(left > right)
     }
 
     @Test
     fun isVersionGraterThen_patch_shouldReturnFalse() {
         val left = listOf(1, 1, 1)
         val right = listOf(1, 1, 5)
-        assertFalse(appDelivery.isVersionGraterThen(left, right))
+        assertFalse(left > right)
     }
 
     @Test
     fun isVersionGraterThen_negative_shouldReturnTrue() {
         val left = listOf(1, 3, 5)
         val right = listOf(-2, 5, 2)
-        assertTrue(appDelivery.isVersionGraterThen(left, right))
+        assertTrue(left > right)
     }
 
     @Test
     fun isVersionGraterThen_doubleDigits_shouldReturnTrue() {
         val left = listOf(1, 15, 1)
         val right = listOf(1, 6, 1)
-        assertTrue(appDelivery.isVersionGraterThen(left, right))
+        assertTrue(left > right)
     }
 
     @Test
     fun isVersionGraterThen_differentLengthShort_shouldReturnTrue() {
         val left = listOf(1, 5)
         val right = listOf(0, 1, 5)
-        assertTrue(appDelivery.isVersionGraterThen(left, right))
+        assertTrue(left > right)
     }
 
     @Test
@@ -192,36 +188,30 @@ class AppDeliveryTest {
 
     @Test
     fun buildVersionCheckResult_updateRequired_ShouldReturnUPDATE_REQUIRED() {
-        val versionDataModel = VersionDataModel(requiredVersion = "99.99.99")
-        val versionCheckResult = appDelivery.buildVersionCheckResult(versionDataModel)
+        val versionDataModel = VersionDataModel(requiredVersion = "99.99.99", currentVersion = "1.2.3")
+        val versionCheckResult = appDelivery.buildVersionResult(versionDataModel)
         assertEquals(VersionResultCode.UPDATE_REQUIRED, versionCheckResult.resultCode)
     }
 
     @Test
     fun buildVersionCheckResult_updateAvailable_ShouldReturnUPDATE_AVAILABLE() {
-        val versionDataModel = VersionDataModel(latestVersion = "99.99.99")
-        val versionCheckResult = appDelivery.buildVersionCheckResult(versionDataModel)
+        val versionDataModel = VersionDataModel(latestVersion = "99.99.99", currentVersion = "1.2.3")
+        val versionCheckResult = appDelivery.buildVersionResult(versionDataModel)
         assertEquals(VersionResultCode.UPDATE_AVAILABLE, versionCheckResult.resultCode)
     }
 
     @Test
     fun buildVersionCheckResult_upToDate_ShouldReturnUP_TO_DATE() {
-        val versionDataModel = VersionDataModel(requiredVersion = "0.0.0", latestVersion = "0.0.0")
-        val versionCheckResult = appDelivery.buildVersionCheckResult(versionDataModel)
+        val versionDataModel = VersionDataModel(requiredVersion = "0.0.0", latestVersion = "0.0.0", currentVersion = "1.2.3")
+        val versionCheckResult = appDelivery.buildVersionResult(versionDataModel)
         assertEquals(VersionResultCode.UP_TO_DATE, versionCheckResult.resultCode)
     }
 
     @Test
-    fun buildVersionCheckResult_pToDate_ShouldReturnUP_TO_DATE() {
-        val versionDataModel = VersionDataModel("com.id.test","0.0.0", "0.0.0", "http://google.com")
-        val versionCheckResult = appDelivery.buildVersionCheckResult(versionDataModel)
-        val expected = VersionCheckResult(
-                VersionResultCode.UP_TO_DATE,
-                "http://google.com",
-                listOf(0, 0, 0),
-                listOf(0, 0, 0),
-                listOf(0, 0, 0))
-        assertEquals(expected, versionCheckResult)
+    fun buildVersionCheckResult_upToDateEqual_ShouldReturnUP_TO_DATE() {
+        val versionDataModel = VersionDataModel(requiredVersion = "1.2.3", latestVersion = "1.2.3", currentVersion = "1.2.3")
+        val versionCheckResult = appDelivery.buildVersionResult(versionDataModel)
+        assertEquals(VersionResultCode.UP_TO_DATE, versionCheckResult.resultCode)
     }
 
 }

@@ -1,6 +1,6 @@
 package com.appshack.appdelivery.logic
 
-import com.appshack.appdelivery.entity.VersionCheckResult
+import com.appshack.appdelivery.entity.VersionResult
 import com.appshack.appdelivery.entity.VersionResultCode
 import com.appshack.appdelivery.interfaces.AppDeliveryInterface
 import com.appshack.appdelivery.interfaces.ResultCallback
@@ -9,55 +9,83 @@ import com.appshack.appdelivery.network.api.parsers.ResponseParser
 import com.appshack.appdelivery.network.api.requests.APIRequest
 import com.appshack.appdelivery.network.api.requests.VersionStatusRequest
 import com.appshack.appdelivery.network.dispatchers.Dispatcher
+import com.appshack.appdelivery.utility.extensions.compareTo
 import com.appshack.appdelivery.utility.extensions.toVersionList
 
 
 /**
  * Created by joelbrostrom on 2018-08-03
  * Developed by App Shack
+ *
+ * Purpose: Make a REST request for version state, get current state and compare to se if app needs
+ *          to be updated.
+ *          If so, the user can be prompted to upgrade or the app can be locked down until the
+ *          required minimum version is met.
  */
 class AppDelivery(private val appDeliveryInterface: AppDeliveryInterface) {
 
-    fun startVersionCheckForResult() {
+    /**
+     * Sets up API-request and a dispatcher.
+     * Calls the dispatchers dispatch().
+     */
+    fun startVersionCheck() {
         val apiRequest: APIRequest = VersionStatusRequest()
         val dispatcher = Dispatcher()
         dispatcher.dispatch(apiRequest, ResponseParser(onResultCallback))
     }
 
-    internal fun buildVersionCheckResult(versionDataModel: VersionDataModel): VersionCheckResult {
+    /**
+     * Returns a VersionResult and set up their members.
+     *
+     * Extract data from versionModel and covert strings to List<Int>.
+     * Adjusts versions to make all Lists equal in length.
+     * Check if updates are available/required.
+     * Creates ResultCode with correct result enum.
+     * Constructs and return a VersionCode with the above as arguments.
+     */
+    internal fun buildVersionResult(versionDataModel: VersionDataModel): VersionResult {
+        val currentVersion = versionDataModel.currentVersion!!.toVersionList()
+        val minVersion = versionDataModel.requiredVersion?.toVersionList() ?: mutableListOf()
+        val maxVersion = versionDataModel.latestVersion?.toVersionList() ?: mutableListOf()
         val downloadUrl = versionDataModel.latestVersionUrl
-        val currentVersion = getCurrentVersion()
-        val minimumVersion = versionDataModel.requiredVersion?.toVersionList() ?: mutableListOf()
-        val maximumVersion = versionDataModel.latestVersion?.toVersionList() ?: mutableListOf()
 
-        val versions = listOf(currentVersion, minimumVersion, maximumVersion)
+        val versions = listOf(currentVersion, minVersion, maxVersion)
         val maxLength = getMaxLength(versions)
         adjustVersionLength(versions, maxLength)
 
-        val isUpdateRequired = isVersionGraterThen(minimumVersion, currentVersion)
-        val isUpdateAvailable = isVersionGraterThen(maximumVersion, currentVersion)
+        val isUpdateRequired = minVersion > currentVersion
+        val isUpdateAvailable = maxVersion > currentVersion
         val resultCode = getVersionResultCode(isUpdateRequired, isUpdateAvailable)
 
-        return VersionCheckResult(
+        return VersionResult(
                 resultCode,
                 downloadUrl,
                 currentVersion,
-                minimumVersion,
-                maximumVersion)
+                minVersion,
+                maxVersion)
     }
 
-    private fun getCurrentVersion(): MutableList<Int> {
+    /**
+     * Returns versionName specified in app build.gradle,
+     * or null if sufficient context is missing.
+     */
+    internal fun getCurrentVersion(): String? {
         return appDeliveryInterface.context?.packageManager
                 ?.getPackageInfo(appDeliveryInterface.context?.packageName, 0)
                 ?.versionName
-                ?.toVersionList()
-                ?: mutableListOf(-1, -1, -1)
     }
 
+    /**
+     * Returns the size of the longest List in a List of Lists
+     */
     internal fun getMaxLength(candidates: List<List<Int>>): Int {
         return candidates.maxBy { it.size }?.size ?: 0
     }
 
+    /**
+     * Returns argument List with all elements padded with zeros to match the length argument.
+     * The zeros are added to the end of the lists, so 1.2 becomes 1.2.0 if length is 3.
+     */
     internal fun adjustVersionLength(versions: List<MutableList<Int>>, length: Int): List<MutableList<Int>> {
         for (version in versions) {
             while (version.size < length) {
@@ -67,14 +95,9 @@ class AppDelivery(private val appDeliveryInterface: AppDeliveryInterface) {
         return versions
     }
 
-    internal fun isVersionGraterThen(leftVersion: List<Int>, rightVersion: List<Int>): Boolean {
-        for ((index, left) in leftVersion.withIndex()) when {
-            left > rightVersion[index] -> return true
-            left < rightVersion[index] -> return false
-        }
-        return false
-    }
-
+    /**
+     * Check if updates are needed and returns the appropriate VersionCode enum.
+     */
     internal fun getVersionResultCode(isUpdateRequired: Boolean?, isUpdateAvailable: Boolean?): VersionResultCode {
         return when {
             isUpdateRequired == true -> VersionResultCode.UPDATE_REQUIRED
@@ -83,22 +106,42 @@ class AppDelivery(private val appDeliveryInterface: AppDeliveryInterface) {
         }
     }
 
+    /**
+     * Handles callback result when dispatcher receives a result from API-request.
+     *
+     * If the result is completed the current version is fetched.
+     * If it's null a Error version result is sent to the appDeliveryInterface,
+     * else buildVersionResult() is called and its result sent to appDeliveryInterface.
+     *
+     * On failure appDeliveryInterface is called with an Error versionResult.
+     */
     private val onResultCallback: ResultCallback = object : ResultCallback {
 
         override fun onComplete(result: VersionDataModel?) {
-            result?.let {
-                val versionCheckResult = buildVersionCheckResult(it)
-                appDeliveryInterface.onVersionCheckResult(versionCheckResult)
+            val currentVersion = getCurrentVersion()
 
+            if (result != null && !currentVersion.isNullOrBlank()) {
+                result.currentVersion = currentVersion
+                val versionResult = buildVersionResult(result)
+                appDeliveryInterface.onVersionCheckResult(versionResult)
+
+            } else {
+                val resultCode = VersionResultCode.ERROR
+                resultCode.string = "Current version could not be found"
+                val versionResult = VersionResult(resultCode)
+                appDeliveryInterface.onVersionCheckResult(versionResult)
             }
         }
 
         override fun onFailure(error: String?) {
-            val versionCheckResult = VersionCheckResult(VersionResultCode.ERROR, errorMessage = error)
-            appDeliveryInterface.onVersionCheckResult(versionCheckResult)
+            val errorResultCode = VersionResultCode.ERROR
+            error?.let { errorResultCode.string = it }
+            val versionResult = VersionResult(errorResultCode, errorMessage = error)
+            appDeliveryInterface.onVersionCheckResult(versionResult)
         }
 
     }
+
 }
 
 
