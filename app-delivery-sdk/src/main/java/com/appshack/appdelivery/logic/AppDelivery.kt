@@ -28,7 +28,7 @@ class AppDelivery(private val appDeliveryInterface: AppDeliveryInterface) {
      * Sets up API-request and a dispatcher.
      * Calls the dispatchers dispatch().
      */
-    fun startVersionCheckForResult() {
+    fun startVersionCheck() {
         val apiRequest: APIRequest = VersionStatusRequest()
         val dispatcher = Dispatcher()
         dispatcher.dispatch(apiRequest, ResponseParser(onResultCallback))

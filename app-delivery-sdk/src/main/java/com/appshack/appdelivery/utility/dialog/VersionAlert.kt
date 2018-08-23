@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import com.appshack.appdelivery.R
 import com.appshack.appdelivery.entity.VersionResult
 import com.appshack.appdelivery.entity.VersionResultCode
 
@@ -24,7 +25,7 @@ class VersionAlert : Activity() {
     companion object {
         fun showDialog(context: Context, versionResult: VersionResult) {
             val intent = Intent(context, VersionAlert::class.java)
-            intent.putExtra("versionResult", versionResult)
+            intent.putExtra(context.getString(R.string.VERSION_RESULT), versionResult)
             context.startActivity(intent)
         }
     }
@@ -39,14 +40,14 @@ class VersionAlert : Activity() {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val versionResult = intent.getSerializableExtra("versionCheckResult") as VersionResult
+        val versionResult = intent.getSerializableExtra(getString(R.string.VERSION_RESULT)) as VersionResult
 
         val appInfo = this.applicationInfo
         val appName = this.packageManager.getApplicationLabel(appInfo).toString()
 
         val defaultDialog = AlertDialog.Builder(this)
                 .setTitle(versionResult.resultCode.string)
-                .setMessage("There is a new version of $appName")
+                .setMessage(getString(R.string.NEW_VERSION_OF_APP_NAME, appName))
                 .setPositiveButton("Download") { _, _ ->
                     val downloadPath = Uri.parse(versionResult.downloadUrl)
                     val intent = Intent(Intent.ACTION_VIEW)
@@ -56,7 +57,7 @@ class VersionAlert : Activity() {
                 }
 
         if (versionResult.resultCode != VersionResultCode.UPDATE_REQUIRED) {
-            defaultDialog.setNegativeButton("Later") { dialog, _ -> dialog.dismiss()
+            defaultDialog.setNegativeButton("Not Now") { dialog, _ -> dialog.dismiss()
                 finish()}
         } else {
             defaultDialog.setCancelable(false)
