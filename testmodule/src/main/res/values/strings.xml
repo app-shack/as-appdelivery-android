@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">App Delivery</string>
+    <string name="FETCHING">Fetching…</string>
 </resources>
