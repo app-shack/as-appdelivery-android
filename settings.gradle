@@ -1,1 +1,1 @@
-include ':app-delivery-sdk', ':testmodule', ':myapplication'
+include ':app-delivery-sdk'
