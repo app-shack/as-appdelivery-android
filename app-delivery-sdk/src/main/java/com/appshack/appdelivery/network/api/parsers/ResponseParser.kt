@@ -1,7 +1,7 @@
 package com.appshack.appdelivery.network.api.parsers
 
 import com.appshack.appdelivery.interfaces.ResultCallback
-import com.appshack.appdelivery.network.api.models.VersionDataModel
+import com.appshack.appdelivery.network.api.models.ProjectDataModel
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.google.gson.JsonParser
@@ -58,9 +58,9 @@ class ResponseParser(private val callback: ResultCallback) : Callback {
             response?.body()?.string()?.let {
                 val mapper = jacksonObjectMapper()
                 val obj = JsonParser().parse(it).toString()
-                val versionDataModel: VersionDataModel = mapper.readValue(obj)
+                val projectDataModel: ProjectDataModel = mapper.readValue(obj)
 
-                callback.onComplete(versionDataModel)
+                callback.onComplete(projectDataModel)
             }
         }
     }

@@ -21,9 +21,11 @@ class Dispatcher {
 
         val path = apiRequest.path
 
+        //TODO Fetch the api key from the SDK init function and pass it along here.
+        //NOTE: the api key needs to be prefixed with "api-key "
         var requestBuilder = Request.Builder()
                 .url(path)
-                .addHeader("Authorization", "")
+                .addHeader("Authorization", "api-key test")
 
         apiRequest.body?.let {
             requestBuilder = when (apiRequest.method) {

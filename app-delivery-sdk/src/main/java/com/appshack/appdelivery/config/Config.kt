@@ -9,6 +9,6 @@ package com.appshack.appdelivery.config
 class Config {
     companion object {
         const val baseUrl: String = //"192.168.72.38:8000" // simon
-        "http://10.0.2.2:3000" // local
+        "http://10.0.2.2:8000" // local
     }
 }
