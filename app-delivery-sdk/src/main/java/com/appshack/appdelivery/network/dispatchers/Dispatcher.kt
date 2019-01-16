@@ -1,11 +1,11 @@
 package com.appshack.appdelivery.network.dispatchers
 
+import android.util.Log
 import com.appshack.appdelivery.network.api.requests.APIRequest
 import com.appshack.appdelivery.network.api.requests.HTTPMethod
 import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.Request
-
 
 /**
  * Created by joelbrostrom on 2018-07-27
@@ -15,6 +15,7 @@ import okhttp3.Request
  */
 
 class Dispatcher {
+
     private val client: OkHttpClient = OkHttpClient()
 
     fun dispatch(apiRequest: APIRequest, responseHandler: Callback) {
@@ -37,6 +38,10 @@ class Dispatcher {
                 HTTPMethod.PUT -> requestBuilder.put(it)
             }
         }
+        Log.d("/dev dispatching Api", """method: ${apiRequest.method}
+            path: ${apiRequest.path}
+            body: ${apiRequest.body}""".trimMargin())
+
         client.newCall(requestBuilder.build()).enqueue(responseHandler)
     }
 }

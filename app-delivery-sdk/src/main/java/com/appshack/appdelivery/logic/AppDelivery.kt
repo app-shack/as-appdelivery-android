@@ -12,7 +12,6 @@ import com.appshack.appdelivery.network.dispatchers.Dispatcher
 import com.appshack.appdelivery.utility.extensions.compareTo
 import com.appshack.appdelivery.utility.extensions.toVersionList
 
-
 /**
  * Created by joelbrostrom on 2018-08-03
  * Developed by App Shack
@@ -29,7 +28,7 @@ class AppDelivery(private val appDeliveryInterface: AppDeliveryInterface) {
      * Calls the dispatchers dispatch().
      */
     fun startVersionCheck() {
-        val apiRequest: APIRequest = VersionStatusRequest()
+        val apiRequest: APIRequest = VersionStatusRequest(getPackageName())
         val dispatcher = Dispatcher()
         dispatcher.dispatch(apiRequest, ResponseParser(onResultCallback))
     }
@@ -43,12 +42,12 @@ class AppDelivery(private val appDeliveryInterface: AppDeliveryInterface) {
      * Creates ResultCode with correct result enum.
      * Constructs and return a VersionCode with the above as arguments.
      */
-    internal fun buildVersionResult(projectDataModel: ProjectDataModel, currentVersion: String?): VersionResult {
-        val versionDataModel = projectDataModel.versions!![0]
-        val currentVersion = currentVersion!!.toVersionList()
+    internal fun buildVersionResult(projectDataModel: ProjectDataModel, currentVersionString: String): VersionResult {
+        val versionDataModel = projectDataModel.versions?.firstOrNull()
+        val currentVersion = currentVersionString.toVersionList()
         val minVersion = projectDataModel.min_version_android?.toVersionList() ?: mutableListOf()
-        val maxVersion = versionDataModel.latestVersion?.toVersionList() ?: mutableListOf()
-        val downloadUrl = versionDataModel.latestVersionUrl
+        val maxVersion = versionDataModel?.latestVersion?.toVersionList() ?: mutableListOf()
+        val downloadUrl = versionDataModel?.latestVersionUrl
 
         val versions = listOf(currentVersion, minVersion, maxVersion)
         val maxLength = getMaxLength(versions)
@@ -66,13 +65,17 @@ class AppDelivery(private val appDeliveryInterface: AppDeliveryInterface) {
                 maxVersion)
     }
 
+    internal fun getPackageName(): String? {
+        return appDeliveryInterface.context?.packageName
+    }
+
     /**
      * Returns versionName specified in app build.gradle,
      * or null if sufficient context is missing.
      */
     internal fun getCurrentVersion(): String? {
         return appDeliveryInterface.context?.packageManager
-                ?.getPackageInfo(appDeliveryInterface.context?.packageName, 0)
+                ?.getPackageInfo(getPackageName(), 0)
                 ?.versionName
     }
 
@@ -118,13 +121,12 @@ class AppDelivery(private val appDeliveryInterface: AppDeliveryInterface) {
      */
     private val onResultCallback: ResultCallback = object : ResultCallback {
 
-        override fun onComplete(result: ProjectDataModel?) {
+        override fun onComplete(result: ProjectDataModel) {
             val currentVersion = getCurrentVersion()
 
-            if (result != null && !result.versions!!.isEmpty() && !currentVersion.isNullOrBlank()) {
+            if (result.versions != null && currentVersion != null) {
                 val versionResult = buildVersionResult(result, currentVersion)
                 appDeliveryInterface.onVersionCheckResult(versionResult)
-
             } else {
                 val resultCode = VersionResultCode.ERROR
                 resultCode.string = "Current version could not be found"
