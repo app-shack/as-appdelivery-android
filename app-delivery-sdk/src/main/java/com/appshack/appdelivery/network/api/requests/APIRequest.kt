@@ -50,7 +50,8 @@ enum class HTTPMethod {
  * Enum containing url paths
  */
 enum class UrlPaths(val path: String) {
-    Updates("/data")
+    //TODO "android_bundle" should be the bundle id of the app.
+    Updates("/api/project/android_bundle/")
 }
 
 /**

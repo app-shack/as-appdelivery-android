@@ -4,7 +4,7 @@ import com.appshack.appdelivery.entity.VersionResult
 import com.appshack.appdelivery.entity.VersionResultCode
 import com.appshack.appdelivery.interfaces.AppDeliveryInterface
 import com.appshack.appdelivery.interfaces.ResultCallback
-import com.appshack.appdelivery.network.api.models.VersionDataModel
+import com.appshack.appdelivery.network.api.models.ProjectDataModel
 import com.appshack.appdelivery.network.api.parsers.ResponseParser
 import com.appshack.appdelivery.network.api.requests.APIRequest
 import com.appshack.appdelivery.network.api.requests.VersionStatusRequest
@@ -43,9 +43,10 @@ class AppDelivery(private val appDeliveryInterface: AppDeliveryInterface) {
      * Creates ResultCode with correct result enum.
      * Constructs and return a VersionCode with the above as arguments.
      */
-    internal fun buildVersionResult(versionDataModel: VersionDataModel): VersionResult {
-        val currentVersion = versionDataModel.currentVersion!!.toVersionList()
-        val minVersion = versionDataModel.requiredVersion?.toVersionList() ?: mutableListOf()
+    internal fun buildVersionResult(projectDataModel: ProjectDataModel, currentVersion: String?): VersionResult {
+        val versionDataModel = projectDataModel.versions!![0]
+        val currentVersion = currentVersion!!.toVersionList()
+        val minVersion = projectDataModel.min_version_android?.toVersionList() ?: mutableListOf()
         val maxVersion = versionDataModel.latestVersion?.toVersionList() ?: mutableListOf()
         val downloadUrl = versionDataModel.latestVersionUrl
 
@@ -117,12 +118,11 @@ class AppDelivery(private val appDeliveryInterface: AppDeliveryInterface) {
      */
     private val onResultCallback: ResultCallback = object : ResultCallback {
 
-        override fun onComplete(result: VersionDataModel?) {
+        override fun onComplete(result: ProjectDataModel?) {
             val currentVersion = getCurrentVersion()
 
-            if (result != null && !currentVersion.isNullOrBlank()) {
-                result.currentVersion = currentVersion
-                val versionResult = buildVersionResult(result)
+            if (result != null && !result.versions!!.isEmpty() && !currentVersion.isNullOrBlank()) {
+                val versionResult = buildVersionResult(result, currentVersion)
                 appDeliveryInterface.onVersionCheckResult(versionResult)
 
             } else {
