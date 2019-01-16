@@ -3,10 +3,6 @@ package com.appshack.appdelivery.network.api.models
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 
-/**
- * Response data model from server request.
- */
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class VersionDataModel(
         @field:JsonProperty("current_version")
