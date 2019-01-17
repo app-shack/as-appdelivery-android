@@ -37,8 +37,8 @@ class VersionAlert : Activity() {
      * If ResultCode is .UPDATE_AVAILABLE the dialog is dismissible,
      * else it's .UPDATE_REQUIRED and the dialog cannot be dismissed.
      *
-     * The positive button routs the user to the url stored in the versionResult.
-     * Typically this is the Download path for the latest app version.
+     * The positive button routs the user to the url stored in the [VersionResult].
+     * Typically this is the Download path for the recommended app version.
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

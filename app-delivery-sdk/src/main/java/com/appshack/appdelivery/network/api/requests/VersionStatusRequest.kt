@@ -8,6 +8,8 @@ import okhttp3.HttpUrl
  * Developed by App Shack
  *
  * Purpose: Contains all information needed for an API-request
+ * @param packageApiDetails takes a [PackageApiDetailsModel] containing information
+ *        needed to construct a version status request
  */
 class VersionStatusRequest(packageApiDetails: PackageApiDetailsModel?) : APIRequest() {
     private val apiPrefix = "api-key "
