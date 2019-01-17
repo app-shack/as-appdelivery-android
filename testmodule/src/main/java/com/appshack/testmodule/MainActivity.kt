@@ -1,6 +1,5 @@
 package com.appshack.testmodule
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
@@ -16,7 +15,6 @@ import com.appshack.appdelivery.interfaces.AppDeliveryInterface
 import com.appshack.appdelivery.logic.AppDelivery
 import com.appshack.appdelivery.utility.dialog.VersionAlert
 import kotlinx.android.synthetic.main.activity_main.*
-
 
 class MainActivity : AppCompatActivity(), AppDeliveryInterface {
 
@@ -35,7 +33,6 @@ class MainActivity : AppCompatActivity(), AppDeliveryInterface {
         appDelivery.startVersionCheck()
     }
 
-    @SuppressLint("SetTextI18n")
     override fun onVersionCheckResult(versionResult: VersionResult) {
 
         runOnUiThread {
@@ -80,9 +77,12 @@ class MainActivity : AppCompatActivity(), AppDeliveryInterface {
             }
 
             if (versionResult.resultCode != ERROR) {
-                responseText.text = "current version: ${versionResult.deviceVersion?.cleanListPrint()}\n" +
-                        "minimum version: ${versionResult.minimumVersion?.cleanListPrint()}\n" +
-                        "maximum version: ${versionResult.recommendedVersion?.cleanListPrint()}\n\n"
+                responseText.text = """
+                        current version: ${versionResult.deviceVersion?.cleanListPrint()}
+                        minimum version: ${versionResult.minimumVersion?.cleanListPrint()}
+                        maximum version: ${versionResult.recommendedVersion?.cleanListPrint()}
+
+                        """
             }
         }
     }
