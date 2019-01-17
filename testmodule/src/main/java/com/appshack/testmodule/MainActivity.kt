@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity(), AppDeliveryInterface {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        appDelivery = AppDelivery(this)
+        appDelivery = AppDelivery(this, "test")
         Log.d("@dev onCreate", "layout completed")
 
         setupListeners()
@@ -74,15 +74,15 @@ class MainActivity : AppCompatActivity(), AppDeliveryInterface {
                 }
 
                 ERROR -> { //Handle error here
-                    responseText.text = versionResult.errorMessage
+                    responseText.text = versionResult.resultCode.message
                 }
 
             }
 
             if (versionResult.resultCode != ERROR) {
-                responseText.text = "current version: ${versionResult.currentVersion?.cleanListPrint()}\n" +
+                responseText.text = "current version: ${versionResult.deviceVersion?.cleanListPrint()}\n" +
                         "minimum version: ${versionResult.minimumVersion?.cleanListPrint()}\n" +
-                        "maximum version: ${versionResult.maximumVersion?.cleanListPrint()}\n\n"
+                        "maximum version: ${versionResult.recommendedVersion?.cleanListPrint()}\n\n"
             }
         }
     }

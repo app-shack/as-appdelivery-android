@@ -60,7 +60,7 @@ class ResponseParser(private val callback: ResultCallback) : Callback {
                 val obj = JsonParser().parse(it).toString()
                 val projectDataModel: ProjectDataModel = mapper.readValue(obj)
 
-                callback.onComplete(projectDataModel)
+                callback.onSuccess(projectDataModel)
             }
         }
     }

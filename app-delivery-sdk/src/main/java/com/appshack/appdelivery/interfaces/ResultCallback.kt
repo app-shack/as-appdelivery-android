@@ -10,6 +10,6 @@ import com.appshack.appdelivery.network.api.models.ProjectDataModel
  * Purpose: contract to have a callback response.
  */
 interface ResultCallback {
-    fun onComplete(result: ProjectDataModel)
+    fun onSuccess(result: ProjectDataModel)
     fun onFailure(error: String?)
 }

@@ -13,8 +13,8 @@ data class ProjectDataModel(
         val versions: List<VersionDataModel>? = null,
 
         @field:JsonProperty("min_version_android")
-        val min_version_android: String? = null,
+        val minVersion: String? = null,
 
         @field:JsonProperty("recommended_version_android")
-        val recommended_version_android: String? = null
+        val recommendedVersion: String? = null
 )

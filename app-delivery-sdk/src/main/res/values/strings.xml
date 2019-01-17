@@ -2,4 +2,5 @@
     <string name="app_name">App Delivery</string>
     <string name="VERSION_RESULT">versionResult</string>
     <string name="NEW_VERSION_OF_APP_NAME">There is a new version of %1$s.</string>
+    <string name="MISSING_APK_WARNING">Update file was missing. Contact your IT manager if the problem persist.</string>
 </resources>

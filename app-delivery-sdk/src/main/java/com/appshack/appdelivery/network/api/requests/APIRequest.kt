@@ -1,6 +1,7 @@
 package com.appshack.appdelivery.network.api.requests
 
 import com.appshack.appdelivery.config.Config
+import okhttp3.Headers
 import okhttp3.HttpUrl
 import okhttp3.RequestBody
 
@@ -16,9 +17,12 @@ import okhttp3.RequestBody
  * but not necessarily a body.
  */
 private interface HttpRequest {
+
     val path: HttpUrl
     val method: HTTPMethod
+    val header: HeaderPair?
     var body: RequestBody?
+
 }
 
 /**
@@ -32,7 +36,7 @@ abstract class APIRequest : HttpRequest {
         get() = HTTPMethod.GET
     override var body: RequestBody? = null
         get() = RequestBody.create(MediaType.FORM.type, "")
-
+    override val header: HeaderPair? = null
 }
 
 /**
@@ -51,6 +55,13 @@ enum class HTTPMethod {
  */
 enum class UrlPaths(val path: String) {
     PROJECT("/api/project/")
+}
+
+/**
+ * Header properties
+ */
+enum class Header(val string: String){
+    AUTHORIZATION("Authorization")
 }
 
 /**

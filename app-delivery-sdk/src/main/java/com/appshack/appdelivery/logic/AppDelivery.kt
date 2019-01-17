@@ -21,14 +21,15 @@ import com.appshack.appdelivery.utility.extensions.toVersionList
  *          If so, the user can be prompted to upgrade or the app can be locked down until the
  *          required minimum version is met.
  */
-class AppDelivery(private val appDeliveryInterface: AppDeliveryInterface) {
+class AppDelivery(private val appDeliveryInterface: AppDeliveryInterface, private val apiKey: String) {
 
     /**
      * Sets up API-request and a dispatcher.
      * Calls the dispatchers dispatch().
      */
     fun startVersionCheck() {
-        val apiRequest: APIRequest = VersionStatusRequest(getPackageName())
+        val packageDataModel = PackageApiDetailsModel(apiKey, getPackageName())
+        val apiRequest: APIRequest = VersionStatusRequest(packageDataModel)
         val dispatcher = Dispatcher()
         dispatcher.dispatch(apiRequest, ResponseParser(onResultCallback))
     }
@@ -42,30 +43,39 @@ class AppDelivery(private val appDeliveryInterface: AppDeliveryInterface) {
      * Creates ResultCode with correct result enum.
      * Constructs and return a VersionCode with the above as arguments.
      */
-    internal fun buildVersionResult(projectDataModel: ProjectDataModel, currentVersionString: String): VersionResult {
-        val versionDataModel = projectDataModel.versions?.firstOrNull()
-        val currentVersion = currentVersionString.toVersionList()
-        val minVersion = projectDataModel.min_version_android?.toVersionList() ?: mutableListOf()
-        val maxVersion = versionDataModel?.latestVersion?.toVersionList() ?: mutableListOf()
-        val downloadUrl = versionDataModel?.latestVersionUrl
+    internal fun buildVersionResult(projectDataModel: ProjectDataModel, deviceVersionName: String? = null)
+            : VersionResult {
 
-        val versions = listOf(currentVersion, minVersion, maxVersion)
+        val versionName = deviceVersionName ?: getDeviceVersionName()
+        ?: return VersionResult(VersionResultCode.ERROR
+                .apply { message = "Could not find current version on device." })
+
+        val deviceVersion = versionName.toVersionList()
+        val minVersion = projectDataModel.minVersion?.toVersionList() ?: mutableListOf()
+        val recommendedVersion = projectDataModel.recommendedVersion?.toVersionList() ?: mutableListOf()
+
+        val versions = listOf(deviceVersion, minVersion, recommendedVersion)
         val maxLength = getMaxLength(versions)
         adjustVersionLength(versions, maxLength)
 
-        val isUpdateRequired = minVersion > currentVersion
-        val isUpdateAvailable = maxVersion > currentVersion
+        val isUpdateRequired = minVersion > deviceVersion
+        val isUpdateAvailable = recommendedVersion > deviceVersion
         val resultCode = getVersionResultCode(isUpdateRequired, isUpdateAvailable)
+
+        val downloadUrl = projectDataModel
+                .versions
+                ?.find { it.versionName?.toVersionList() == recommendedVersion }
+                ?.apkFile
 
         return VersionResult(
                 resultCode,
                 downloadUrl,
-                currentVersion,
+                deviceVersion,
                 minVersion,
-                maxVersion)
+                recommendedVersion)
+
     }
 
-    internal fun getPackageName(): String? {
         return appDeliveryInterface.context?.packageName
     }
 
@@ -73,7 +83,7 @@ class AppDelivery(private val appDeliveryInterface: AppDeliveryInterface) {
      * Returns versionName specified in app build.gradle,
      * or null if sufficient context is missing.
      */
-    internal fun getCurrentVersion(): String? {
+    internal fun getDeviceVersionName(): String? {
         return appDeliveryInterface.context?.packageManager
                 ?.getPackageInfo(getPackageName(), 0)
                 ?.versionName
@@ -90,9 +100,9 @@ class AppDelivery(private val appDeliveryInterface: AppDeliveryInterface) {
      * Returns argument List with all elements padded with zeros to match the length argument.
      * The zeros are added to the end of the lists, so 1.2 becomes 1.2.0 if length is 3.
      */
-    internal fun adjustVersionLength(versions: List<MutableList<Int>>, length: Int): List<MutableList<Int>> {
+    internal fun adjustVersionLength(versions: List<MutableList<Int>>, minLength: Int): List<MutableList<Int>> {
         for (version in versions) {
-            while (version.size < length) {
+            while (version.size < minLength) {
                 version.add(0)
             }
         }
@@ -121,24 +131,15 @@ class AppDelivery(private val appDeliveryInterface: AppDeliveryInterface) {
      */
     private val onResultCallback: ResultCallback = object : ResultCallback {
 
-        override fun onComplete(result: ProjectDataModel) {
-            val currentVersion = getCurrentVersion()
-
-            if (result.versions != null && currentVersion != null) {
-                val versionResult = buildVersionResult(result, currentVersion)
-                appDeliveryInterface.onVersionCheckResult(versionResult)
-            } else {
-                val resultCode = VersionResultCode.ERROR
-                resultCode.string = "Current version could not be found"
-                val versionResult = VersionResult(resultCode)
-                appDeliveryInterface.onVersionCheckResult(versionResult)
-            }
+        override fun onSuccess(result: ProjectDataModel) {
+            val versionResult = buildVersionResult(result)
+            appDeliveryInterface.onVersionCheckResult(versionResult)
         }
 
         override fun onFailure(error: String?) {
             val errorResultCode = VersionResultCode.ERROR
-            error?.let { errorResultCode.string = it }
-            val versionResult = VersionResult(errorResultCode, errorMessage = error)
+            error?.let { errorResultCode.message = it }
+            val versionResult = VersionResult(errorResultCode)
             appDeliveryInterface.onVersionCheckResult(versionResult)
         }
 
