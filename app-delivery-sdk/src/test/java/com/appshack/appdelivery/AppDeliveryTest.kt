@@ -3,7 +3,7 @@ package com.appshack.appdelivery
 import com.appshack.appdelivery.entity.VersionResultCode
 import com.appshack.appdelivery.interfaces.AppDeliveryInterface
 import com.appshack.appdelivery.logic.AppDelivery
-import com.appshack.appdelivery.network.api.models.VersionDataModel
+import com.appshack.appdelivery.network.api.models.ProjectDataModel
 import com.appshack.appdelivery.utility.extensions.compareTo
 import com.appshack.appdelivery.utility.extensions.toVersionList
 import com.nhaarman.mockitokotlin2.mock
@@ -11,18 +11,19 @@ import junit.framework.Assert.*
 import org.junit.Before
 import org.junit.Test
 
-
 /**
  * Created by joelbrostrom on 2018-08-04
  * Developed by App Shack
  */
 class AppDeliveryTest {
+
+    private val mockKey = "test" //Add valid key here.
     private lateinit var appDelivery: AppDelivery
 
     @Before
     fun setup() {
         val appDeliveryInterface: AppDeliveryInterface = mock()
-        appDelivery = AppDelivery(appDeliveryInterface)
+        appDelivery = AppDelivery(appDeliveryInterface, mockKey)
     }
 
     @Test
@@ -188,29 +189,29 @@ class AppDeliveryTest {
 
     @Test
     fun buildVersionCheckResult_updateRequired_ShouldReturnUPDATE_REQUIRED() {
-        val versionDataModel = VersionDataModel(requiredVersion = "99.99.99", currentVersion = "1.2.3")
-        val versionCheckResult = appDelivery.buildVersionResult(versionDataModel)
+        val projectDataModel = ProjectDataModel(minVersion = "1.2.3", recommendedVersion = "1.3.0")
+        val versionCheckResult = appDelivery.buildVersionResult(projectDataModel, "1.0.0")
         assertEquals(VersionResultCode.UPDATE_REQUIRED, versionCheckResult.resultCode)
     }
 
     @Test
     fun buildVersionCheckResult_updateAvailable_ShouldReturnUPDATE_AVAILABLE() {
-        val versionDataModel = VersionDataModel(latestVersion = "99.99.99", currentVersion = "1.2.3")
-        val versionCheckResult = appDelivery.buildVersionResult(versionDataModel)
+        val projectDataModel = ProjectDataModel(minVersion = "0.0.0", recommendedVersion = "1.2.3")
+        val versionCheckResult = appDelivery.buildVersionResult(projectDataModel, "1.0.0")
         assertEquals(VersionResultCode.UPDATE_AVAILABLE, versionCheckResult.resultCode)
     }
 
     @Test
     fun buildVersionCheckResult_upToDate_ShouldReturnUP_TO_DATE() {
-        val versionDataModel = VersionDataModel(requiredVersion = "0.0.0", latestVersion = "0.0.0", currentVersion = "1.2.3")
-        val versionCheckResult = appDelivery.buildVersionResult(versionDataModel)
+        val projectDataModel = ProjectDataModel(minVersion = "0.0.0", recommendedVersion = "1.2.3")
+        val versionCheckResult = appDelivery.buildVersionResult(projectDataModel, "1.2.4")
         assertEquals(VersionResultCode.UP_TO_DATE, versionCheckResult.resultCode)
     }
 
     @Test
     fun buildVersionCheckResult_upToDateEqual_ShouldReturnUP_TO_DATE() {
-        val versionDataModel = VersionDataModel(requiredVersion = "1.2.3", latestVersion = "1.2.3", currentVersion = "1.2.3")
-        val versionCheckResult = appDelivery.buildVersionResult(versionDataModel)
+        val projectDataModel = ProjectDataModel(minVersion = "0.0.0", recommendedVersion = "1.2.3")
+        val versionCheckResult = appDelivery.buildVersionResult(projectDataModel, "1.2.3")
         assertEquals(VersionResultCode.UP_TO_DATE, versionCheckResult.resultCode)
     }
 
