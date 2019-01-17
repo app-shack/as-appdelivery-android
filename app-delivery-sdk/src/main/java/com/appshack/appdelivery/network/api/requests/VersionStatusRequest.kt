@@ -9,8 +9,11 @@ import okhttp3.HttpUrl
  *
  * Purpose: Contains all information needed for an API-request
  */
-class VersionStatusRequest(packageName: String?) : APIRequest() {
-
+class VersionStatusRequest(packageApiDetails: PackageApiDetailsModel?) : APIRequest() {
+    private val apiPrefix = "api-key "
     override val method: HTTPMethod = HTTPMethod.GET
-    override val path: HttpUrl = HttpUrl.parse(Config.baseUrl + UrlPaths.PROJECT.path + packageName)!!
+    override val path: HttpUrl = HttpUrl.parse(Config.baseUrl + UrlPaths.PROJECT.path + packageApiDetails?.packageName)!!
+    override val header: HeaderPair? = packageApiDetails?.apiKey?.let { value ->
+        HeaderPair(Header.AUTHORIZATION.string, apiPrefix + value)
+    }
 }

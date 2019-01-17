@@ -26,7 +26,10 @@ class Dispatcher {
         //NOTE: the api key needs to be prefixed with "api-key "
         var requestBuilder = Request.Builder()
                 .url(path)
-                .addHeader("Authorization", "api-key test")
+
+        apiRequest.header?.let { header ->
+            requestBuilder.addHeader(header.name, header.value)
+        }
 
         apiRequest.body?.let {
             requestBuilder = when (apiRequest.method) {
@@ -38,8 +41,10 @@ class Dispatcher {
                 HTTPMethod.PUT -> requestBuilder.put(it)
             }
         }
+
         Log.d("/dev dispatching Api", """method: ${apiRequest.method}
             path: ${apiRequest.path}
+            header: ${apiRequest.header?.name} : ${apiRequest.header?.value}
             body: ${apiRequest.body}""".trimMargin())
 
         client.newCall(requestBuilder.build()).enqueue(responseHandler)

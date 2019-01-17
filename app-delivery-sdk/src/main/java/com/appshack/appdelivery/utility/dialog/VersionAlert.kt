@@ -7,6 +7,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import com.appshack.appdelivery.R
+import android.widget.Toast
 import com.appshack.appdelivery.entity.VersionResult
 import com.appshack.appdelivery.entity.VersionResultCode
 
@@ -23,6 +24,7 @@ class VersionAlert : Activity() {
      * Static function showDialog() starts an activity necessary to display the alert dialog.
      */
     companion object {
+
         fun showDialog(context: Context, versionResult: VersionResult) {
             val intent = Intent(context, VersionAlert::class.java)
             intent.putExtra(context.getString(R.string.VERSION_RESULT), versionResult)
@@ -46,19 +48,30 @@ class VersionAlert : Activity() {
         val appName = this.packageManager.getApplicationLabel(appInfo).toString()
 
         val defaultDialog = AlertDialog.Builder(this)
-                .setTitle(versionResult.resultCode.string)
+                .setTitle(versionResult.resultCode.message)
                 .setMessage(getString(R.string.NEW_VERSION_OF_APP_NAME, appName))
                 .setPositiveButton("Download") { _, _ ->
-                    val downloadPath = Uri.parse(versionResult.downloadUrl)
-                    val intent = Intent(Intent.ACTION_VIEW)
-                    intent.data = downloadPath
-                    this.startActivity(intent)
-                    finish()
+                    if (versionResult.downloadUrl != null) {
+                        val downloadPath = Uri.parse(versionResult.downloadUrl)
+                        val intent = Intent(Intent.ACTION_VIEW)
+                        intent.data = downloadPath
+                        this.startActivity(intent)
+                        finish()
+                    } else {
+                        Toast.makeText(this,
+                                getString(com.appshack.appdelivery.R.string.MISSING_APK_WARNING),
+                                Toast.LENGTH_LONG)
+                                .show()
+                        showDialog(this, versionResult)
+                        finish()
+                    }
                 }
 
         if (versionResult.resultCode != VersionResultCode.UPDATE_REQUIRED) {
-            defaultDialog.setNegativeButton("Not Now") { dialog, _ -> dialog.dismiss()
-                finish()}
+            defaultDialog.setNegativeButton("Not Now") { dialog, _ ->
+                dialog.dismiss()
+                finish()
+            }
         } else {
             defaultDialog.setCancelable(false)
         }
