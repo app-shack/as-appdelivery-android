@@ -18,12 +18,18 @@ class Dispatcher {
 
     private val client: OkHttpClient = OkHttpClient()
 
+    /**
+     * Dispatch an [APIRequest] and enqueue the responseHandler to run once
+     * a result have been returned from the api.
+     *
+     * @param apiRequest generic request containing required request params.
+     * @param responseHandler is called on api result and handles the deserialization
+     *        and mapping of json properties.
+     */
     fun dispatch(apiRequest: APIRequest, responseHandler: Callback) {
 
         val path = apiRequest.path
 
-        //TODO Fetch the api key from the SDK init function and pass it along here.
-        //NOTE: the api key needs to be prefixed with "api-key "
         var requestBuilder = Request.Builder()
                 .url(path)
 

@@ -6,7 +6,9 @@ package com.appshack.appdelivery.utility.extensions
  * Developed by App Shack
  *
  * Purpose: Returns itself as an List of Integers.
- * Requires the string to follow the syntax "Int.Int.Int...Int"
+ * String must follow the syntax "Int.Int.Int...Int"
+ *
+ * @example "1.22.3".toVersionList() == [1, 22, 3] //true
  */
 
 fun String.toVersionList():MutableList<Int> =

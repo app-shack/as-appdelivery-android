@@ -7,6 +7,7 @@ import com.appshack.appdelivery.interfaces.ResultCallback
 import com.appshack.appdelivery.network.api.models.ProjectDataModel
 import com.appshack.appdelivery.network.api.parsers.ResponseParser
 import com.appshack.appdelivery.network.api.requests.APIRequest
+import com.appshack.appdelivery.network.api.requests.PackageApiDetailsModel
 import com.appshack.appdelivery.network.api.requests.VersionStatusRequest
 import com.appshack.appdelivery.network.dispatchers.Dispatcher
 import com.appshack.appdelivery.utility.extensions.compareTo
@@ -15,11 +16,18 @@ import com.appshack.appdelivery.utility.extensions.toVersionList
 /**
  * Created by joelbrostrom on 2018-08-03
  * Developed by App Shack
- *
- * Purpose: Make a REST request for version state, get current state and compare to se if app needs
+ */
+
+/**
+ * Purpose: Make a REST request for project state, get local state and compare to se if app needs
  *          to be updated.
  *          If so, the user can be prompted to upgrade or the app can be locked down until the
  *          required minimum version is met.
+ *
+ * Init:
+ * @param appDeliveryInterface an object implementing the AppDeliveryInterface,
+ *        usually the activity holding the AppDelivery object.
+ * @param apiKey the api key provided by App Delivery backend management.
  */
 class AppDelivery(private val appDeliveryInterface: AppDeliveryInterface, private val apiKey: String) {
 
@@ -35,13 +43,18 @@ class AppDelivery(private val appDeliveryInterface: AppDeliveryInterface, privat
     }
 
     /**
-     * Returns a VersionResult and set up their members.
+     * Sets up and returns a VersionResult object.
      *
-     * Extract data from versionModel and covert strings to List<Int>.
+     * Extract data from projectDataModel and covert strings to List<Int>.
      * Adjusts versions to make all Lists equal in length.
      * Check if updates are available/required.
      * Creates ResultCode with correct result enum.
      * Constructs and return a VersionCode with the above as arguments.
+     *
+     * @param projectDataModel returned from api request to app delivery back end.
+     * @param deviceVersionName the current version running on device.
+     *        This is passed as a param instead of fetched in method to enable testing.
+     * @return VersionResult containing information of the current state and required actions.
      */
     internal fun buildVersionResult(projectDataModel: ProjectDataModel, deviceVersionName: String? = null)
             : VersionResult {
@@ -76,11 +89,15 @@ class AppDelivery(private val appDeliveryInterface: AppDeliveryInterface, privat
 
     }
 
+    /**
+     * @return the project package name specified in the Manifest.
+     */
+    private fun getPackageName(): String? {
         return appDeliveryInterface.context?.packageName
     }
 
     /**
-     * Returns versionName specified in app build.gradle,
+     * @return versionName specified in app build.gradle,
      * or null if sufficient context is missing.
      */
     internal fun getDeviceVersionName(): String? {
@@ -90,15 +107,21 @@ class AppDelivery(private val appDeliveryInterface: AppDeliveryInterface, privat
     }
 
     /**
-     * Returns the size of the longest List in a List of Lists
+     * @param candidates a list containing list<Int> of various lengths.
+     * @return the size of the longest List in a List of Lists.
+     * @example used to determine the longest format of a list of versions split into Lists of Integers.
+     *          For example. [ [1, 2, 0], [1, 2] ] would return 2.
      */
     internal fun getMaxLength(candidates: List<List<Int>>): Int {
         return candidates.maxBy { it.size }?.size ?: 0
     }
 
     /**
-     * Returns argument List with all elements padded with zeros to match the length argument.
+     * Pad versions with zeros to match the minLength argument.
      * The zeros are added to the end of the lists, so 1.2 becomes 1.2.0 if length is 3.
+     * @param versions list of versions to be adjusted.
+     * @param minLength value of minimum length.
+     * @Return List with padded elements.
      */
     internal fun adjustVersionLength(versions: List<MutableList<Int>>, minLength: Int): List<MutableList<Int>> {
         for (version in versions) {
@@ -110,7 +133,11 @@ class AppDelivery(private val appDeliveryInterface: AppDeliveryInterface, privat
     }
 
     /**
-     * Check if updates are needed and returns the appropriate VersionCode enum.
+     * Return VersionCode enum depending on app state.
+     * if isUpdateRequired and isUpdateAvailable is both true only UPDATE_REQUIRED will be returned.
+     * @param isUpdateRequired
+     * @param isUpdateAvailable
+     * @return VersionCode enum.
      */
     internal fun getVersionResultCode(isUpdateRequired: Boolean?, isUpdateAvailable: Boolean?): VersionResultCode {
         return when {
@@ -123,11 +150,11 @@ class AppDelivery(private val appDeliveryInterface: AppDeliveryInterface, privat
     /**
      * Handles callback result when dispatcher receives a result from API-request.
      *
-     * If the result is completed the current version is fetched.
-     * If it's null a Error version result is sent to the appDeliveryInterface,
-     * else buildVersionResult() is called and its result sent to appDeliveryInterface.
+     * @onSuccess call buildVersionResult with the callback result as param.
+     * The VersionResult is then sent to appDeliveryInterface callback method,
+     * from where the developer implementing this SDK have to handle the response.
      *
-     * On failure appDeliveryInterface is called with an Error versionResult.
+     * @onFailure appDeliveryInterface is called with an Error versionResult.
      */
     private val onResultCallback: ResultCallback = object : ResultCallback {
 
