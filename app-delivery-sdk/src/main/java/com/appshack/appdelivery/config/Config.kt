@@ -11,12 +11,10 @@ package com.appshack.appdelivery.config
 class Config {
 
     /**
-     * Static singleton containing app wide constants.
-     * @property baseUrl holds the api base url.
+     * Static object containing app constants.
+     * @property baseUrl holds the base url for api requests.
      */
     companion object {
-        const val baseUrl: String = "http://192.168.72.157:8000"
-        //"192.168.72.38:8000" // simon
-        //"http://10.0.2.2:8000" // local
+        const val baseUrl: String = "https://appdelivery.betashack.se"
     }
 }

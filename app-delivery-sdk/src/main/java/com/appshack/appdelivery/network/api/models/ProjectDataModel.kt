@@ -1,7 +1,5 @@
 package com.appshack.appdelivery.network.api.models
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.annotation.JsonProperty
 
 /**
  * Response data model from server request.
@@ -12,14 +10,20 @@ import com.fasterxml.jackson.annotation.JsonProperty
  * @property recommendedVersion the latest stable version.
  */
 
-@JsonIgnoreProperties(ignoreUnknown = true)
+//@JsonIgnoreProperties(ignoreUnknown = true)
+//data class ProjectDataModel(
+//        @field:JsonProperty("android_versions")
+//        val versions: List<VersionDataModel>? = null,
+//
+//        @field:JsonProperty("min_version_android")
+//        val minVersion: String? = null,
+//
+//        @field:JsonProperty("recommended_version_android")
+//        val maxVersionName: String? = null
+//)
+
 data class ProjectDataModel(
-        @field:JsonProperty("android_versions")
-        val versions: List<VersionDataModel>? = null,
-
-        @field:JsonProperty("min_version_android")
-        val minVersion: String? = null,
-
-        @field:JsonProperty("recommended_version_android")
-        val recommendedVersion: String? = null
+        val minVersionCode: Int,
+        val minVersionName: String,
+        val latestVersion: VersionDataModel
 )

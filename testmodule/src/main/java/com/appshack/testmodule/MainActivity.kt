@@ -77,12 +77,9 @@ class MainActivity : AppCompatActivity(), AppDeliveryInterface {
             }
 
             if (versionResult.resultCode != ERROR) {
-                responseText.text = """
-                        current version: ${versionResult.deviceVersion?.cleanListPrint()}
-                        minimum version: ${versionResult.minimumVersion?.cleanListPrint()}
-                        maximum version: ${versionResult.recommendedVersion?.cleanListPrint()}
-
-                        """
+                responseText.text = "current version: ${versionResult.currentVersionName}(${versionResult.currentVersionCode})\n" +
+                        "minimum version: ${versionResult.minVersionName}(${versionResult.minVersionCode})\n" +
+                        "maximum version: ${versionResult.maxVersionName}(${versionResult.maxVersionCode})"
             }
         }
     }

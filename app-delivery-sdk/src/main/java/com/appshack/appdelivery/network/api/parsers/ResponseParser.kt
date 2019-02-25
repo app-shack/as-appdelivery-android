@@ -46,7 +46,7 @@ class ResponseParser(private val callback: ResultCallback) : Callback {
     }
 
     /**
-     * Checks if error message is returned and calls on failure if thats the case.
+     * Checks if error message is returned and calls on failure if that's the case.
      * If not, proceed to parse the response Json object to a VersionDataModel and call Interface
      * with it as an argument.
      */
