@@ -18,11 +18,10 @@ import okhttp3.RequestBody
  */
 private interface HttpRequest {
 
-    val path: HttpUrl
+    val path: HttpUrl?
     val method: HTTPMethod
     val header: HeaderPair?
-    var body: RequestBody?
-
+    val body: RequestBody?
 }
 
 /**
@@ -30,12 +29,10 @@ private interface HttpRequest {
  */
 abstract class APIRequest : HttpRequest {
 
-    override val path: HttpUrl
-        get() = HttpUrl.parse(Config.baseUrl)!!
+    override val path: HttpUrl? = null
     override val method: HTTPMethod
         get() = HTTPMethod.GET
-    override var body: RequestBody? = null
-        get() = RequestBody.create(MediaType.FORM.type, "")
+    override val body: RequestBody? = null
     override val header: HeaderPair? = null
 }
 
@@ -54,7 +51,7 @@ enum class HTTPMethod {
  * Enum containing url paths
  */
 enum class UrlPaths(val path: String) {
-    PROJECT("/api/project/")
+    PROJECT("/api/project")
 }
 
 /**

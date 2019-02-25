@@ -8,15 +8,21 @@ import java.io.Serializable
  * results calculated.
  *
  * @property resultCode enum containing the result of the version check.
- * @property downloadUrl holds path to apk
- * @property deviceVersion holds the current version of the app on the local device.
- * @property minimumVersion holds the minimum required (forced) version of the app.
- * @property recommendedVersion holds the recommended version of the app.
+ * @property downloadUrl holds path to apk.
+ * @property currentVersionName holds the current version of the app on the local device.
+ * @property minVersionName holds the minimum required (forced) version of the app.
+ * @property maxVersionName holds the recommended version of the app.
+ * @property currentVersionCode holds the current version code on the local device.
+ * @property minVersionCode holds the minimum required version code.
+ * @property maxVersionCode holds the maximum version code of the app.
  */
 data class VersionResult(
         val resultCode: VersionResultCode,
         val downloadUrl: String? = null,
-        val deviceVersion: List<Int>? = null,
-        val minimumVersion: List<Int>? = null,
-        val recommendedVersion: List<Int>? = null
-) : Serializable
+        val currentVersionName: String? = null,
+        val minVersionName: String? = null,
+        val maxVersionName: String? = null,
+        val currentVersionCode: Int? = null,
+        val minVersionCode: Int? = null,
+        val maxVersionCode: Int? = null
+        ) : Serializable

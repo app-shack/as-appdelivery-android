@@ -10,7 +10,7 @@ package com.appshack.appdelivery.network.api.requests
  * @param apiKey the string provided by backend for identification.
  * @param packageName the apps package name for identifying project and platform.
  */
-data class PackageApiDetailsModel(val apiKey: String?, val packageName:String?)
+data class ApiRequestDetails(val apiKey: String, val packageName:String)
 
 /**
  * Holds name:value key par for adding params to header in api request.

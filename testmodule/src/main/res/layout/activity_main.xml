@@ -2,23 +2,30 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/lightGray">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical">
 
     <TextView
         android:id="@+id/statusTextView"
-        android:layout_alignLeft="@id/responseText"
-        android:layout_above="@+id/responseText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:autoLink="web" />
+        android:autoLink="web"
+        tools:text="Test result header"/>
 
     <TextView
         android:id="@+id/responseText"
-        android:layout_centerInParent="true"
+        android:textAlignment="gravity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        tools:text="Details" />
+    </LinearLayout>
 
     <Button
         android:id="@+id/fetchButton"
@@ -26,7 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
         android:layout_centerHorizontal="true"
-        android:text="Fetch"
+        android:text="@string/fetch"
         android:layout_alignParentBottom="true" />
 
 </RelativeLayout>
