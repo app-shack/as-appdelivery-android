@@ -4,10 +4,11 @@ import com.appshack.appdelivery.entity.VersionResult
 import com.appshack.appdelivery.entity.VersionResultCode
 import com.appshack.appdelivery.interfaces.AppDeliveryInterface
 import com.appshack.appdelivery.interfaces.ResultCallback
-import com.appshack.appdelivery.network.api.models.ProjectDataModel
+import com.appshack.appdelivery.network.api.models.VersionStateResponse
+import com.appshack.appdelivery.network.api.parsers.ResponseParser
 import com.appshack.appdelivery.network.api.requests.APIRequest
 import com.appshack.appdelivery.network.api.requests.ApiRequestDetails
-import com.appshack.appdelivery.network.api.requests.VersionStatusRequest
+import com.appshack.appdelivery.network.api.requests.VersionStateRequest
 import com.appshack.appdelivery.network.dispatchers.Dispatcher
 import com.appshack.appdelivery.network.mockresponse.MOCKProvider
 
@@ -41,7 +42,7 @@ class AppDelivery(private val appInterface: AppDeliveryInterface, private val ap
      */
     private val onResultCallback: ResultCallback = object : ResultCallback {
 
-        override fun onSuccess(result: ProjectDataModel) {
+        override fun onSuccess(result: VersionStateResponse) {
             val versionResult = buildVersionResult(result)
             appInterface.onVersionCheckResult(versionResult)
         }
@@ -60,10 +61,10 @@ class AppDelivery(private val appInterface: AppDeliveryInterface, private val ap
      */
     fun startVersionCheck() {
         val packageDataModel = ApiRequestDetails(apiKey, appInterface.bundleId)
-        val apiRequest: APIRequest = VersionStatusRequest(packageDataModel)
+        val apiRequest: APIRequest = VersionStateRequest(packageDataModel)
         val dispatcher = Dispatcher()
-        onResultCallback.onSuccess(MOCKProvider.projectDataModelResponse) //TODO: Replace with live data
-        //dispatcher.dispatch(apiRequest, ResponseParser(onResultCallback)) //HttpOk call live data.
+        //onResultCallback.onSuccess(MOCKProvider.projectDataModelResponse) //TODO: Replace with live data
+        dispatcher.dispatch(apiRequest, ResponseParser(onResultCallback)) //HttpOk call live data.
     }
 
     /**
@@ -73,31 +74,29 @@ class AppDelivery(private val appInterface: AppDeliveryInterface, private val ap
      * Creates ResultCode with correct result enum.
      * Constructs and return a VersionCode with the above as arguments.
      *
-     * @param projectDataModel returned from api request to app delivery back end.
+     * @param versionStateResponse returned from api request to app delivery back end.
      * @param appInfo contains information about the appInterface Implementor.
      * @return VersionResult containing information of the current state and required actions.
      */
-    internal fun buildVersionResult(projectDataModel: ProjectDataModel): VersionResult {
+    internal fun buildVersionResult(versionStateResponse: VersionStateResponse): VersionResult {
 
         val currentVersionName = appInterface.versionName
-        val minVersionName = projectDataModel.minVersionName
-        val maxVersionName = projectDataModel.latestVersion.versionName
+        val maxVersionName = versionStateResponse.latestVersionName
 
         val currentVersionCode = appInterface.versionCode
-        val minVersionCode = projectDataModel.minVersionCode
-        val maxVersionCode = projectDataModel.latestVersion.versionCode
+        val minVersionCode = versionStateResponse.minVersionCode
+        val maxVersionCode = versionStateResponse.latestVersionCode
 
         val isUpdateRequired = minVersionCode > currentVersionCode
         val isUpdateAvailable = maxVersionCode > currentVersionCode
         val resultCode = getVersionResultCode(isUpdateRequired, isUpdateAvailable)
 
-        val downloadUrl = projectDataModel.latestVersion.apkFile
+        val downloadUrl = versionStateResponse.apkFile
 
         return VersionResult(
                 resultCode,
                 downloadUrl,
                 currentVersionName,
-                minVersionName,
                 maxVersionName,
                 currentVersionCode,
                 minVersionCode,

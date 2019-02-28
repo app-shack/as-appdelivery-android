@@ -1,10 +1,10 @@
 package com.appshack.appdelivery
 
+import com.appshack.appdelivery.entity.VersionResult
 import com.appshack.appdelivery.entity.VersionResultCode
 import com.appshack.appdelivery.interfaces.AppDeliveryInterface
 import com.appshack.appdelivery.logic.AppDelivery
-import com.appshack.appdelivery.network.api.models.ProjectDataModel
-import com.appshack.appdelivery.network.api.models.VersionDataModel
+import com.appshack.appdelivery.network.api.models.VersionStateResponse
 import com.nhaarman.mockitokotlin2.mock
 import junit.framework.Assert.assertEquals
 import org.junit.Test
@@ -15,9 +15,16 @@ import org.mockito.Mockito.`when`
  * Developed by App Shack
  */
 class AppDeliveryTest {
-    private val mockKey = "test" //Add valid key here.
-    private val appDeliveryInterface: AppDeliveryInterface = mock()
-    private val appDelivery: AppDelivery = AppDelivery(appDeliveryInterface, mockKey)
+    private val appDeliveryInterface: AppDeliveryInterface
+    private val appDelivery: AppDelivery
+    private val versionStateResponse: VersionStateResponse
+
+    init {
+        val mockKey = "test" //Add valid key here.
+        versionStateResponse = VersionStateResponse("",2,"","1.2.3", 3)
+        appDeliveryInterface= mock()
+        appDelivery = AppDelivery(appDeliveryInterface, mockKey)
+    }
 
     @Test
     fun getVersionResultCode_isRequired_shouldReturn_UPDATE_REQUIRED() {
@@ -51,8 +58,8 @@ class AppDeliveryTest {
         `when`(appDeliveryInterface.bundleId).thenReturn("com.test.appDelivery")
         `when`(appDeliveryInterface.versionCode).thenReturn(1)
         `when`(appDeliveryInterface.versionName).thenReturn("1.0.0")
-        val projectDataModel = ProjectDataModel(2, "1.0.1", VersionDataModel(3))
-        val versionCheckResult = appDelivery.buildVersionResult(projectDataModel)
+        val versionCheckResult = appDelivery.buildVersionResult(versionStateResponse)
+
         assertEquals(VersionResultCode.UPDATE_REQUIRED, versionCheckResult.resultCode)
     }
 
@@ -61,8 +68,8 @@ class AppDeliveryTest {
         `when`(appDeliveryInterface.bundleId).thenReturn("com.test.appDelivery")
         `when`(appDeliveryInterface.versionCode).thenReturn(2)
         `when`(appDeliveryInterface.versionName).thenReturn("1.0.1")
-        val projectDataModel = ProjectDataModel(2, "1.0.1", VersionDataModel(3))
-        val versionCheckResult = appDelivery.buildVersionResult(projectDataModel)
+
+        val versionCheckResult = appDelivery.buildVersionResult(versionStateResponse)
         assertEquals(VersionResultCode.UPDATE_AVAILABLE, versionCheckResult.resultCode)
     }
 
@@ -71,8 +78,8 @@ class AppDeliveryTest {
         `when`(appDeliveryInterface.bundleId).thenReturn("com.test.appDelivery")
         `when`(appDeliveryInterface.versionCode).thenReturn(3)
         `when`(appDeliveryInterface.versionName).thenReturn("1.0.2")
-        val projectDataModel = ProjectDataModel(2, "1.0.1", VersionDataModel(3))
-        val versionCheckResult = appDelivery.buildVersionResult(projectDataModel)
+
+        val versionCheckResult = appDelivery.buildVersionResult(versionStateResponse)
         assertEquals(VersionResultCode.UP_TO_DATE, versionCheckResult.resultCode)
     }
 

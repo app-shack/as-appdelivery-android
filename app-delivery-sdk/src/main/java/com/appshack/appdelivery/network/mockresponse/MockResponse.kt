@@ -1,7 +1,6 @@
 package com.appshack.appdelivery.network.mockresponse
 
-import com.appshack.appdelivery.network.api.models.ProjectDataModel
-import com.appshack.appdelivery.network.api.models.VersionDataModel
+import com.appshack.appdelivery.network.api.models.VersionStateResponse
 
 
 /**
@@ -14,13 +13,13 @@ import com.appshack.appdelivery.network.api.models.VersionDataModel
  */
 class MOCKProvider {
     companion object {
-        val projectDataModelResponse = ProjectDataModel(
+        val projectDataModelResponse = VersionStateResponse(
+                "This release solves bugs A-Z",
                 2,
-                "1.0.2",
-                VersionDataModel(4,
-                        "1.0.3",
-                        "This release solves bugs A-Z",
-                        "https://google.com"))
+                "https://google.com",
+                "1.0.3",
+                4
+        )
     }
 }
 

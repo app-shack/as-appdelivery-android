@@ -1,6 +1,6 @@
 package com.appshack.appdelivery.interfaces
 
-import com.appshack.appdelivery.network.api.models.ProjectDataModel
+import com.appshack.appdelivery.network.api.models.VersionStateResponse
 
 
 /**
@@ -10,6 +10,6 @@ import com.appshack.appdelivery.network.api.models.ProjectDataModel
  * Purpose: contract to have a callback response.
  */
 interface ResultCallback {
-    fun onSuccess(result: ProjectDataModel)
+    fun onSuccess(result: VersionStateResponse)
     fun onFailure(error: String?)
 }
