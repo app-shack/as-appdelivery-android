@@ -11,7 +11,7 @@ import okhttp3.HttpUrl
  * @param apiRequestDetails takes a [ApiRequestDetails] containing information
  *        needed to construct a version status request
  */
-class VersionStatusRequest(apiRequestDetails: ApiRequestDetails) : APIRequest() {
+class VersionStateRequest(apiRequestDetails: ApiRequestDetails) : APIRequest() {
     private val apiPrefix = "api-key "
     override val method: HTTPMethod = HTTPMethod.GET
     override val path: HttpUrl? = HttpUrl.parse(Config.baseUrl + UrlPaths.PROJECT.path + '/' + apiRequestDetails.packageName)

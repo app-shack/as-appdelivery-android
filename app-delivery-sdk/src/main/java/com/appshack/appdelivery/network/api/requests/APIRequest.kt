@@ -51,7 +51,7 @@ enum class HTTPMethod {
  * Enum containing url paths
  */
 enum class UrlPaths(val path: String) {
-    PROJECT("/api/project")
+    PROJECT("/api/android-version")
 }
 
 /**
